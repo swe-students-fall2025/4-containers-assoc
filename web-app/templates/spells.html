@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SpellSight | Spell Compendium</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+    </head>
+    <body>
+        <header class="app-header">
+            <div class="app-header__inner">
+                <div class="brand">Holingo</div>
+                <form class="search-bar" role="search" aria-label="Spell search">
+                    <input
+                        type="search"
+                        placeholder="Search spell by name..."
+                        aria-label="Search spell name"
+                    />
+                    <button type="submit">Search</button>
+                </form>
+                <nav class="nav-links">
+                    <a href="{{ url_for('index') }}">Live Feed</a>
+                    <a href="{{ url_for('spells') }}" class="active">Spells</a>
+                </nav>
+            </div>
+        </header>
+        <main>
+            <section class="spells-layout">
+                <aside class="filters">
+                    <h2>Filters</h2>
+                    <div class="filter-group">
+                        <label for="spell-type">Spell type</label>
+                        <select id="spell-type" name="spell-type">
+                            <option value="">All types</option>
+                            <option value="Charm">Charm</option>
+                            <option value="Curse">Curse</option>
+                            <option value="Transfiguration">Transfiguration</option>
+                            <option value="Healing">Healing</option>
+                            <option value="Defense">Defense</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="difficulty">Difficulty</label>
+                        <select id="difficulty" name="difficulty">
+                            <option value="">Any level</option>
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                        </select>
+                    </div>
+                </aside>
+
+                <section class="spell-list" aria-live="polite">
+                    {% if spells %}
+                    <div class="table-wrapper">
+                        <table class="spell-table">
+                            <thead>
+                                <tr>
+                                    <th>Spell</th>
+                                    <th>Pronunciation</th>
+                                    <th>Description</th>
+                                    <th>Type</th>
+                                    <th>Difficulty</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for spell in spells %}
+                                <tr>
+                                    <td>{{ spell.spell }}</td>
+                                    <td>{{ spell.pronunciation or "—" }}</td>
+                                    <td>{{ spell.description or "No description available." }}</td>
+                                    <td>{{ spell.type or "Unknown" }}</td>
+                                    <td>{{ spell.difficulty or "Unspecified" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <article class="spell-card">
+                        <h3>No spells found</h3>
+                        <p>The compendium is empty. Populate your MongoDB collection to view spells here.</p>
+                    </article>
+                    {% endif %}
+                </section>
+            </section>
+        </main>
+        <footer>Developed by Team Assoc.</footer>
+    </body>
+</html>
+

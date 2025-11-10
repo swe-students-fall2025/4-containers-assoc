@@ -1,32 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Harry Potter Spells</title>
-    <style>
-        body { font-family: Georgia, serif; background-color: #f7f5f2; padding: 30px; }
-        h1 { text-align: center; color: #3c2a21; }
-        table { width: 80%; margin: 20px auto; border-collapse: collapse; background: #fff; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
-        th { background-color: #e6d5b8; }
-        tr:hover { background-color: #f9f3e5; }
-    </style>
-</head>
-<body>
-    <h1>✨ Harry Potter Spells ✨</h1>
-    <table>
-        <tr>
-            <th>Spell</th>
-            <th>Pronunciation</th>
-            <th>Description</th>
-        </tr>
-        {% for spell in spells %}
-        <tr>
-            <td>{{ spell.spell }}</td>
-            <td>{{ spell.pronunciation }}</td>
-            <td>{{ spell.description }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SpellSight | Live Recognition</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+    </head>
+    <body>
+        <header class="app-header">
+            <div class="app-header__inner">
+                <div class="brand">Holingo</div>
+                <form class="search-bar" role="search" aria-label="Spell search">
+                    <input
+                        type="search"
+                        placeholder="If you want search function..."
+                        aria-label="Search spell name"
+                    />
+                    <button type="submit">Search</button>
+                </form>
+                <nav class="nav-links">
+                    <a href="{{ url_for('index') }}" class="active">Live Feed</a>
+                    <a href="{{ url_for('spells') }}">Spells</a>
+                </nav>
+            </div>
+        </header>
+        <main>
+            <section class="live-stack">
+                <div class="live-frame">
+                    <div class="live-header">
+                        <h1>Live Spell Feedback</h1>
+                        <p>Animated pixel figure reacts to spells in real time.</p>
+                    </div>
+                    <div class="viz-placeholder" role="img" aria-label="Spell animation placeholder">
+                        <div class="viz-hint">Drop animation sprite here</div>
+                    </div>
+                    <div class="side-panel">
+                        <div class="output-section">
+                            <h2>Recognition</h2>
+                            <div class="output-window" aria-live="polite">
+                                <p>Awaiting voice input...</p>
+                                {% if spells %}
+                                <p>
+                                    <span class="spell-meta">Last stored spell:</span>
+                                    {{ spells[0].spell }}
+                                </p>
+                                <p>
+                                    <span class="spell-meta">Pronunciation:</span>
+                                    {{ spells[0].pronunciation or "—" }}
+                                </p>
+                                {% else %}
+                                <p><span class="spell-meta">Spell library:</span> empty</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="control-bar">
+                            <button type="button" class="voice-trigger">Voice Recognition</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <footer>Developed by Team Assoc.</footer>
+    </body>
 </html>

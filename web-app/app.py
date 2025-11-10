@@ -15,11 +15,23 @@ db = client[os.getenv("DB_NAME")]
 spells_col = db["spells"]
 
 
+def fetch_spells():
+    """Return all spells from MongoDB without ObjectId fields."""
+    return list(spells_col.find({}, {"_id": 0}))
+
+
 @app.route("/")
 def index():
-    """Flask web application that displays stored Harry Potter spells from MongoDB."""
-    spells = list(spells_col.find({}, {"_id": 0}))
+    """Render the live recognition dashboard with a snapshot of stored spells."""
+    spells = fetch_spells()
     return render_template("index.html", spells=spells)
+
+
+@app.route("/spells")
+def spells():
+    """Render the spell compendium page."""
+    spells = fetch_spells()
+    return render_template("spells.html", spells=spells)
 
 
 if __name__ == "__main__":
