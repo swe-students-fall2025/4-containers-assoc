@@ -28,7 +28,7 @@ def index():
 
 
 @app.route("/spells")
-def spells():
+def spells_view():
     """Render the spell compendium page."""
     spells = fetch_spells()
     return render_template("spells.html", spells=spells)
