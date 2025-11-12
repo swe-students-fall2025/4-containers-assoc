@@ -4,15 +4,10 @@ import os
 from flask import Flask, render_template, abort
 from pymongo import MongoClient
 from dotenv import load_dotenv
-import certifi
-from pymongo import MongoClient
 
 load_dotenv()  # loads .env from root directory
 
 app = Flask(__name__)
-
-MONGO_URI = os.getenv("MONGO_URI")
-DB_NAME = os.getenv("DB_NAME")
 
 client = MongoClient(MONGO_URI, tls=True, tlsCAFile=certifi.where())
 db = client[DB_NAME]
