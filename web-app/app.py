@@ -1,7 +1,7 @@
 """Flask web application that allows user to check Harry Potter spell pronunciation."""
 
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, abort
 from pymongo import MongoClient
 from dotenv import load_dotenv
 
@@ -32,6 +32,15 @@ def spells_view():
     """Render the spell compendium page."""
     spells = fetch_spells()
     return render_template("spells.html", spells=spells)
+
+
+@app.route("/spells/<spell_name>")
+def spell_view(spell_name):
+    """Render detail view for a single spell."""
+    spell = spells_col.find_one({"spell": spell_name}, {"_id": 0})
+    if not spell:
+        abort(404)
+    return render_template("spellpage.html", spell=spell)
 
 
 if __name__ == "__main__":

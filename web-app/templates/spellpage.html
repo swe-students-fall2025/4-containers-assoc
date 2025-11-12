@@ -13,10 +13,18 @@
   <body>
     <header class="app-header">
       <div class="app-header__inner">
-        <div class="brand">SpellSight</div>
+        <div class="brand">Holingo</div>
+        <form class="search-bar" role="search" aria-label="Spell search">
+          <input
+            type="search"
+            placeholder="Search spell by name..."
+            aria-label="Search spell name"
+          />
+          <button type="submit">Search</button>
+        </form>
         <nav class="nav-links">
-          <a href="{{ url_for('index') }}">Home</a>
-          <a href="{{ url_for('spells_view') }}">All Spells</a>
+          <a href="{{ url_for('index') }}">Live Feed</a>
+          <a href="{{ url_for('spells_view') }}" class="active">Spells</a>
         </nav>
       </div>
     </header>
@@ -47,7 +55,7 @@
       </section>
 
       <div class="back-section">
-        <a href="{{ url_for('spells_view') }}" class="back-link">← Back to all spells</a>
+        <a href="{{ url_for('spells_view') }}" class="back-chip">← All spells</a>
       </div>
     </main>
 
