@@ -259,12 +259,6 @@ footer {
 }
 
 /* Spells page specifics */
-.spells-layout {
-    display: grid;
-    gap: 2rem;
-    grid-template-columns: minmax(0, 280px) 1fr;
-}
-
 .filters {
     background: rgba(15, 23, 42, 0.75);
     border: 1px solid rgba(148, 163, 184, 0.25);
@@ -272,11 +266,26 @@ footer {
     padding: 1.5rem;
     display: grid;
     gap: 1.35rem;
+    margin-bottom: 2rem;
+}
+
+.filters h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: rgba(226, 232, 240, 0.85);
+}
+
+.filters__group-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem 1.75rem;
 }
 
 .filter-group {
     display: grid;
     gap: 0.4rem;
+    min-width: 200px;
 }
 
 .filters label {
@@ -357,6 +366,30 @@ footer {
     color: rgba(209, 213, 219, 0.85);
     font-size: 0.95rem;
     line-height: 1.6;
+}
+
+.back-section {
+    margin-top: 1.5rem;
+}
+
+.back-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(15, 23, 42, 0.65);
+    font-size: 0.88rem;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    color: rgba(226, 232, 240, 0.9);
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.back-chip:hover {
+    border-color: rgba(94, 234, 212, 0.4);
+    background: rgba(94, 234, 212, 0.12);
 }
 
 .spell-meta {
