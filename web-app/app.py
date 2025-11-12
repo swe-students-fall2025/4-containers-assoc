@@ -1,4 +1,4 @@
-"""Flask web application that allows user to check Harry Potter spell pronounciation."""
+"""Flask web application that allows user to check Harry Potter spell pronunciation."""
 
 import os
 from flask import Flask, render_template
