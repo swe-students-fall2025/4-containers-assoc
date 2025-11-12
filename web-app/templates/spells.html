@@ -67,7 +67,11 @@
                             <tbody>
                                 {% for spell in spells %}
                                 <tr>
-                                    <td>{{ spell.spell }}</td>
+                                    <td>
+                                        <a href="{{ url_for('spell_view', spell_name=spell.spell) }}">
+                                            {{ spell.spell }}
+                                        </a>
+                                    </td>
                                     <td>{{ spell.pronunciation or "—" }}</td>
                                     <td>{{ spell.description or "No description available." }}</td>
                                     <td>{{ spell.type or "Unknown" }}</td>

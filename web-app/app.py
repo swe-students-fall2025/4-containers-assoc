@@ -1,23 +1,38 @@
 """Flask web application that allows user to check Harry Potter spell pronounciation."""
 
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, abort
 from pymongo import MongoClient
 from dotenv import load_dotenv
-
+import certifi
+from pymongo import MongoClient
 
 load_dotenv()  # loads .env from root directory
 
 app = Flask(__name__)
 
-client = MongoClient(os.getenv("MONGO_URI"))
-db = client[os.getenv("DB_NAME")]
+MONGO_URI = os.getenv("MONGO_URI")
+DB_NAME = os.getenv("DB_NAME")
+
+client = MongoClient(MONGO_URI, tls=True, tlsCAFile=certifi.where())
+db = client[DB_NAME]
 spells_col = db["spells"]
 
 
 def fetch_spells():
     """Return all spells from MongoDB without ObjectId fields."""
     return list(spells_col.find({}, {"_id": 0}))
+
+
+@app.route("/spell/<spell_name>")
+def spell_view(spell_name):
+    """Display a specific spell by its name."""
+    spell = spells_col.find_one({"spell": spell_name})
+    if not spell:
+        abort(404)
+    return render_template("spellpage.html", spell=spell)
+
+
 
 
 @app.route("/")
