@@ -9,8 +9,8 @@ load_dotenv()  # loads .env from root directory
 
 app = Flask(__name__)
 
-client = MongoClient(MONGO_URI, tls=True, tlsCAFile=certifi.where())
-db = client[DB_NAME]
+client = MongoClient(os.getenv("MONGO_URI"))
+db = client[os.getenv("DB_NAME")]
 spells_col = db["spells"]
 
 
