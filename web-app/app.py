@@ -3,10 +3,7 @@
 import os
 from flask import Flask, render_template, abort
 from pymongo import MongoClient
-from dotenv import load_dotenv
 
-
-load_dotenv()  # loads .env from root directory
 
 app = Flask(__name__)
 
