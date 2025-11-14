@@ -25,16 +25,16 @@
             </div>
         </header>
         <main>
-            <section class="spells-layout">
-                <aside class="filters">
-                    <h2>Filters</h2>
+            <section class="filters filters--inline" aria-label="Spell filters">
+                <h2>Filters</h2>
+
+                <div class="filters__group-container">
                     <div class="filter-group">
                         <label for="spell-type">Spell type</label>
                         <select id="spell-type" name="spell-type">
                             <option value="">All types</option>
                             <option value="Charm">Charm</option>
                             <option value="Curse">Curse</option>
-                            <option value="Transfiguration">Transfiguration</option>
                             <option value="Healing">Healing</option>
                             <option value="Defense">Defense</option>
                         </select>
@@ -49,41 +49,45 @@
                             <option value="Advanced">Advanced</option>
                         </select>
                     </div>
-                </aside>
+                </div>
+            </section>
 
-                <section class="spell-list" aria-live="polite">
-                    {% if spells %}
-                    <div class="table-wrapper">
-                        <table class="spell-table">
-                            <thead>
-                                <tr>
-                                    <th>Spell</th>
-                                    <th>Pronunciation</th>
-                                    <th>Description</th>
-                                    <th>Type</th>
-                                    <th>Difficulty</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for spell in spells %}
-                                <tr>
-                                    <td>{{ spell.spell }}</td>
-                                    <td>{{ spell.pronunciation or "—" }}</td>
-                                    <td>{{ spell.description or "No description available." }}</td>
-                                    <td>{{ spell.type or "Unknown" }}</td>
-                                    <td>{{ spell.difficulty or "Unspecified" }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                    <article class="spell-card">
-                        <h3>No spells found</h3>
-                        <p>The compendium is empty. Populate your MongoDB collection to view spells here.</p>
-                    </article>
-                    {% endif %}
-                </section>
+            <section class="spell-list" aria-live="polite">
+                {% if spells %}
+                <div class="table-wrapper">
+                    <table class="spell-table">
+                        <thead>
+                            <tr>
+                                <th>Spell</th>
+                                <th>Pronunciation</th>
+                                <th>Description</th>
+                                <th>Type</th>
+                                <th>Difficulty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for spell in spells %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('spell_view', spell_name=spell.spell) }}">
+                                        {{ spell.spell }}
+                                    </a>
+                                </td>
+                                <td>{{ spell.pronunciation or "—" }}</td>
+                                <td>{{ spell.description or "No description available." }}</td>
+                                <td>{{ spell.type or "Unknown" }}</td>
+                                <td>{{ spell.difficulty or "Unspecified" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <article class="spell-card">
+                    <h3>No spells found</h3>
+                    <p>The compendium is empty. Populate your MongoDB collection to view spells here.</p>
+                </article>
+                {% endif %}
             </section>
         </main>
         <footer>Developed by Team Assoc.</footer>

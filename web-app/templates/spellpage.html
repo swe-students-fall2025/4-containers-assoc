@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ spell.spell }} | SpellSight</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+  </head>
+
+  <body>
+    <header class="app-header">
+      <div class="app-header__inner">
+        <div class="brand">Holingo</div>
+        <form class="search-bar" role="search" aria-label="Spell search">
+          <input
+            type="search"
+            placeholder="Search spell by name..."
+            aria-label="Search spell name"
+          />
+          <button type="submit">Search</button>
+        </form>
+        <nav class="nav-links">
+          <a href="{{ url_for('index') }}">Live Feed</a>
+          <a href="{{ url_for('spells_view') }}" class="active">Spells</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="spell-page">
+      <section class="spell-card">
+        <h1 class="spell-name">{{ spell.spell }}</h1>
+
+        <div class="spell-info">
+          <p>
+            <strong>Pronunciation:</strong>
+            <em>{{ spell.pronunciation or "Not available" }}</em>
+          </p>
+
+          <p>
+            <strong>Description:</strong>
+            {{ spell.description or "No description available." }}
+          </p>
+
+          {% if spell.type %}
+          <p><strong>Type:</strong> {{ spell.type }}</p>
+          {% endif %}
+
+          {% if spell.difficulty %}
+          <p><strong>Difficulty:</strong> {{ spell.difficulty }}</p>
+          {% endif %}
+        </div>
+      </section>
+
+      <div class="back-section">
+        <a href="{{ url_for('spells_view') }}" class="back-chip">← All spells</a>
+      </div>
+    </main>
+
+    <footer>
+      <p>Developed by Team Assoc.</p>
+    </footer>
+  </body>
+</html>
