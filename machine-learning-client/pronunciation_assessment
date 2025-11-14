@@ -1,0 +1,23 @@
+from azure.cognitiveservices.speech import SpeechConfig, AudioConfig
+import azure.cognitiveservices.speech as speechsdk
+import os
+from azure.identity import DefaultAzureCredential
+from azure.keyvault.secrets import SecretClient
+
+KVUri = os.getenv("kv_url")
+speech_region = os.getenv("SPEECH_REGION")
+secret_n = os.getenv("secret_name")
+
+credential = DefaultAzureCredential()
+client = SecretClient(vault_url=KVUri, credential=credential)
+
+retrieved_secret = client.get_secret(secret_n)
+
+# Now you can use the API key:
+
+api_key = retrieved_secret.value
+print(f"The API key is: {api_key}")
+
+speech_config = SpeechConfig(subscription=api_key, region=speech_region)
+audio_config = AudioConfig(use_default_microphone=True) # this need to be changed to audio file from frontend
+speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, language="en-US", audio_config=audio_config)

@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+azure-cognitiveservices-speech = "*"
 
 [dev-packages]
 black = "*"
