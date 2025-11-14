@@ -4,10 +4,10 @@ import os
 from datetime import datetime, timezone
 from typing import BinaryIO, Dict, Optional
 
-from bson import ObjectId
-from dotenv import load_dotenv
-from gridfs import GridFS
-from pymongo import MongoClient
+from bson import ObjectId  # pylint: disable=import-error
+from dotenv import load_dotenv  # pylint: disable=import-error
+from gridfs import GridFS  # pylint: disable=import-error
+from pymongo import MongoClient  # pylint: disable=import-error
 
 load_dotenv()
 
@@ -33,7 +33,7 @@ class AudioStore:
             raise ValueError("MONGO_URI and DB_NAME environment variables must be set")
         return cls(mongo_uri, db_name, collection=collection)
 
-    def save_audio(
+    def save_audio(  # pylint: disable=too-many-arguments
         self,
         file_obj: BinaryIO,
         *,
@@ -96,4 +96,3 @@ class AudioStore:
     def get_attempts_by_spell(self, spell: str):
         """Get all pronunciation attempts for a specific spell."""
         return list(self._attempts_col.find({"spell": spell}).sort("recorded_at", -1))
-
