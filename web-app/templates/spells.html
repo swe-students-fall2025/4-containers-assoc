@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>SpellSight | Spell Compendium</title>
+        <title>Holingo | Spell Compendium</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
     </head>
     <body>
@@ -19,7 +19,7 @@
                     <button type="submit">Search</button>
                 </form>
                 <nav class="nav-links">
-                    <a href="{{ url_for('index') }}">Live Feed</a>
+
                     <a href="{{ url_for('spells_view') }}" class="active">Spells</a>
                 </nav>
             </div>
@@ -63,6 +63,7 @@
                                 <th>Description</th>
                                 <th>Type</th>
                                 <th>Difficulty</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -77,6 +78,11 @@
                                 <td>{{ spell.description or "No description available." }}</td>
                                 <td>{{ spell.type or "Unknown" }}</td>
                                 <td>{{ spell.difficulty or "Unspecified" }}</td>
+                                <td>
+                                    <a href="{{ url_for('index') }}?spell={{ spell.spell }}" class="try-spell-btn">
+                                        Try
+                                    </a>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>

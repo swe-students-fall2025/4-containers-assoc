@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ spell.spell }} | SpellSight</title>
+    <title>{{ spell.spell }} | Holingo</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/main.css') }}"
@@ -23,7 +23,7 @@
           <button type="submit">Search</button>
         </form>
         <nav class="nav-links">
-          <a href="{{ url_for('index') }}">Live Feed</a>
+
           <a href="{{ url_for('spells_view') }}" class="active">Spells</a>
         </nav>
       </div>
@@ -51,6 +51,12 @@
           {% if spell.difficulty %}
           <p><strong>Difficulty:</strong> {{ spell.difficulty }}</p>
           {% endif %}
+        </div>
+
+        <div style="margin-top: 1.5rem; text-align: center;">
+          <a href="{{ url_for('index') }}?spell={{ spell.spell }}" class="try-spell-btn">
+            Try
+          </a>
         </div>
       </section>
 
