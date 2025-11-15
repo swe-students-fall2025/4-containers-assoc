@@ -5,7 +5,9 @@ import sys
 from flask import Flask, render_template, abort, request, jsonify
 from pymongo import MongoClient
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "machine-learning-client"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "machine-learning-client")
+)
 from audio_store import AudioStore  # pylint: disable=wrong-import-position,import-error
 
 app = Flask(__name__)
@@ -72,7 +74,10 @@ def upload_audio():
             content_type=audio_file.content_type or "audio/webm",
         )
 
-        return jsonify({"success": True, "file_id": str(file_id), "spell": spell_name}), 200
+        return (
+            jsonify({"success": True, "file_id": str(file_id), "spell": spell_name}),
+            200,
+        )
 
     except Exception as e:  # pylint: disable=broad-except
         return jsonify({"error": str(e)}), 500
