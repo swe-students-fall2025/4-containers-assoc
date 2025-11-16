@@ -24,7 +24,6 @@ api_key = retrieved_secret.value
 # print(f"The API key is: {api_key}")
 
 def pronunciation_assessment(standard, user_audio):
-    
 
     speech_config = SpeechConfig(subscription=api_key, region=speech_region)
     audio_config = AudioConfig(filename=user_audio) # this need to be changed to audio file from frontend

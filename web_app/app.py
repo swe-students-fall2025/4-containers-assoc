@@ -6,9 +6,9 @@ from flask import Flask, render_template, abort, request, jsonify
 from pymongo import MongoClient
 
 sys.path.insert(
-    0, os.path.join(os.path.dirname(__file__), "..", "machine-learning-client")
+    0, os.path.join(os.path.dirname(__file__), "..")
 )
-from audio_store import AudioStore  # pylint: disable=wrong-import-position,import-error
+from machine_learning_client.audio_store import AudioStore  # pylint: disable=wrong-import-position,import-error
 
 app = Flask(__name__)
 
