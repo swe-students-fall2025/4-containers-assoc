@@ -1,0 +1,211 @@
+[{
+    "spell": "Accio",
+    "pronunciation": "AK-see-oh",
+    "description": "Summons an object toward the caster.",
+    "type": "Charm",
+    "difficulty": "Intermediate"
+  },
+  {
+    "spell": "Alohomora",
+    "pronunciation": "ah-LOH-ho-MOR-ah",
+    "description": "Unlocks doors and other locked objects.",
+    "type": "Charm",
+    "difficulty": "Beginner"
+  },
+  {
+    "spell": "Avada Kedavra",
+    "pronunciation": "uh-VAH-duh keh-DAH-vruh",
+    "description": "Kills the victim instantly.",
+    "type": "Curse",
+    "difficulty": "Advanced"
+  },
+  {
+    "spell": "Crucio",
+    "pronunciation": "KROO-shee-oh",
+    "description": "Inflicts unbearable pain on the target.",
+    "type": "Curse",
+    "difficulty": "Advanced"
+  },
+  {
+    "spell": "Imperio",
+    "pronunciation": "im-PAIR-ee-oh",
+    "description": "Places the victim completely under the caster’s control.",
+    "type": "Curse",
+    "difficulty": "Advanced"
+  },
+  {
+    "spell": "Expelliarmus",
+    "pronunciation": "ex-PELL-ee-AR-mus",
+    "description": "Disarms an opponent, forcing them to release what they’re holding.",
+    "type": "Defense",
+    "difficulty": "Intermediate"
+  },
+  {
+    "spell": "Expecto Patronum",
+    "pronunciation": "ex-PEK-toh pah-TROH-num",
+    "description": "Conjures a Patronus to repel Dementors.",
+    "type": "Defense",
+    "difficulty": "Advanced"
+  },
+  {
+    "spell": "Lumos",
+    "pronunciation": "LOO-mos",
+    "description": "Produces light from the caster’s wand tip.",
+    "type": "Charm",
+    "difficulty": "Beginner"
+  },
+  {
+    "spell": "Nox",
+    "pronunciation": "NOCKS",
+    "description": "Extinguishes light produced by Lumos.",
+    "type": "Charm",
+    "difficulty": "Beginner"
+  },
+  {
+    "spell": "Wingardium Leviosa",
+    "pronunciation": "win-GAR-dee-um lev-ee-OH-sa",
+    "description": "Makes an object levitate.",
+    "type": "Charm",
+    "difficulty": "Beginner"
+  },
+  {
+    "spell": "Petrificus Totalus",
+    "pronunciation": "peh-TRI-fi-cus to-TAL-us",
+    "description": "Paralyzes the victim completely.",
+    "type": "Curse",
+    "difficulty": "Intermediate"
+  },
+  {
+    "spell": "Protego",
+    "pronunciation": "pro-TAY-go",
+    "description": "Creates a magical shield to deflect spells.",
+    "type": "Defense",
+    "difficulty": "Intermediate"
+  },
+  {
+    "spell": "Stupefy",
+    "pronunciation": "STEW-peh-fye",
+    "description": "Stuns the target, rendering them unconscious.",
+    "type": "Defense",
+    "difficulty": "Intermediate"
+  },
+  {
+    "spell": "Rictusempra",
+    "pronunciation": "RIC-tuh-SEM-pra",
+    "description": "Tickles the target, causing uncontrollable laughter.",
+    "type": "Charm",
+    "difficulty": "Beginner"
+  },
+  {
+    "spell": "Expulso",
+    "pronunciation": "ex-PUL-so",
+    "description": "Causes an object to explode.",
+    "type": "Curse",
+    "difficulty": "Advanced"
+  },
+  {
+    "spell": "Diffindo",
+    "pronunciation": "dih-FIN-doh",
+    "description": "Slices or rips the target object.",
+    "type": "Charm",
+    "difficulty": "Intermediate"
+  },
+  {
+    "spell": "Episkey",
+    "pronunciation": "eh-PIS-key",
+    "description": "Heals minor injuries like cuts or broken noses.",
+    "type": "Healing",
+    "difficulty": "Beginner"
+  },
+  {
+    "spell": "Reparo",
+    "pronunciation": "reh-PAH-roh",
+    "description": "Repairs broken objects.",
+    "type": "Charm",
+    "difficulty": "Beginner"
+  },
+  {
+    "spell": "Obliviate",
+    "pronunciation": "oh-BLIV-ee-ate",
+    "description": "Erases specific memories from a person's mind.",
+    "type": "Charm",
+    "difficulty": "Advanced"
+  },
+  {
+    "spell": "Silencio",
+    "pronunciation": "si-LEN-see-oh",
+    "description": "Silences the target.",
+    "type": "Charm",
+    "difficulty": "Intermediate"
+  },
+  {
+    "spell": "Incendio",
+    "pronunciation": "in-SEN-dee-oh",
+    "description": "Conjures fire.",
+    "type": "Charm",
+    "difficulty": "Intermediate"
+  },
+  {
+    "spell": "Aguamenti",
+    "pronunciation": "AH-gwah-MEN-tee",
+    "description": "Conjures a jet of clean water.",
+    "type": "Charm",
+    "difficulty": "Intermediate"
+  },
+  {
+    "spell": "Finite Incantatem",
+    "pronunciation": "fi-NEE-tay in-can-TAH-tem",
+    "description": "Ends all ongoing spells in the area.",
+    "type": "Defense",
+    "difficulty": "Intermediate"
+  },
+  {
+    "spell": "Rennervate",
+    "pronunciation": "REN-er-vate",
+    "description": "Revives someone who has been stunned or knocked unconscious.",
+    "type": "Healing",
+    "difficulty": "Intermediate"
+  },
+  {
+    "spell": "Colloportus",
+    "pronunciation": "co-lo-POR-tus",
+    "description": "Magically locks a door.",
+    "type": "Charm",
+    "difficulty": "Beginner"
+  },
+  {
+    "spell": "Reducto",
+    "pronunciation": "reh-DUK-toh",
+    "description": "Blasts solid objects into pieces.",
+    "type": "Curse",
+    "difficulty": "Advanced"
+  },
+  {
+    "spell": "Impervius",
+    "pronunciation": "im-PUR-vee-us",
+    "description": "Makes objects repel water and other substances.",
+    "type": "Charm",
+    "difficulty": "Beginner"
+  },
+  {
+    "spell": "Scourgify",
+    "pronunciation": "SKUR-ji-fye",
+    "description": "Cleans an object.",
+    "type": "Charm",
+    "difficulty": "Beginner"
+  },
+  {
+    "spell": "Tarantallegra",
+    "pronunciation": "ta-RAN-tuh-LEG-rah",
+    "description": "Forces the target’s legs to dance uncontrollably.",
+    "type": "Charm",
+    "difficulty": "Intermediate"
+  },
+  {
+    "spell": "Obscuro",
+    "pronunciation": "ob-SKOO-roh",
+    "description": "Conjures a blindfold over the target’s eyes.",
+    "type": "Charm",
+    "difficulty": "Intermediate"
+  }]
+  
