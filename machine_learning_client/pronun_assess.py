@@ -46,8 +46,10 @@ def pronunciation_assessment(standard, user_audio):
     print("Recognized text:", speech_recognition_result.text)
 
     if speech_recognition_result.reason != speechsdk.ResultReason.RecognizedSpeech:
-        # You might later return a dict instead of a string
-        return f"Recognition failed: {speech_recognition_result.reason}"
+        return {
+            "success": False,
+            "error": f"Recognition failed: {speech_recognition_result.reason}",
+        }
 
     # The pronunciation assessment result as a Speech SDK object
     result = speechsdk.PronunciationAssessmentResult(speech_recognition_result)
@@ -59,6 +61,9 @@ def pronunciation_assessment(standard, user_audio):
     print("Accuracy:", result.accuracy_score)
     #print("JSON:", result_json)
 
-    output = f"Recognized text: {speech_recognition_result.text}, Accuracy: {result.accuracy_score}"
-
-    return output
+    return {
+        "success": True,
+        "recognized_text": speech_recognition_result.text,
+        "accuracy_score": result.accuracy_score,
+        "reference_text": standard,
+    }
