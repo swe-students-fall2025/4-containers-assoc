@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Holingo | Spell Compendium</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+        <script src="{{ url_for('static', filename='js/spell-recognition.js') }}" defer></script>
     </head>
     <body>
         <header class="app-header">
@@ -108,18 +109,4 @@
         </main>
             <footer>Developed by Team Assoc.</footer>
     </body>
-
-    <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const filterForm = document.querySelector(".filters form");
-        
-        document.querySelector("#spell-type").addEventListener("change", () => {
-            filterForm.submit();
-        });
-
-        document.querySelector("#difficulty").addEventListener("change", () => {
-            filterForm.submit();
-        });
-    });
-    </script>
 </html>

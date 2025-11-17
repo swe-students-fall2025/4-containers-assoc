@@ -548,7 +548,12 @@ function startRecording() {
     
     mediaRecorder.start();
     isRecording = true;
-    updateOutputWindow('Recording... Click to stop and upload.');
+    const spellName = currentSpell || 'Unknown spell';
+    if (currentSpell) {
+        updateOutputWindow(`Recording "${spellName}"... Click to stop.`, spellName);
+    } else {
+        updateOutputWindow('Recording... Click to stop and upload.');
+    }
     updateVoiceButton();
 }
 
@@ -584,9 +589,9 @@ async function uploadAudio() {
         const result = await response.json();
         
         if (response.ok && result.success) {
-            updateOutputWindow(`Audio uploaded successfully for spell: ${result.spell}`, result.spell);
-            if (currentSpell && SPELL_ANIMATIONS[currentSpell]) {
-                playSpellAnimation(currentSpell);
+            updateOutputWindow(`Audio uploaded successfully for spell: ${result.spell}. Calculating your score ...`, result.spell);
+            if (result.file_id && result.spell) {
+                await assessPronunciation(result.file_id, result.spell);
             }
         } else {
             updateOutputWindow('Upload failed: ' + (result.error || 'Unknown error'));
@@ -594,6 +599,86 @@ async function uploadAudio() {
     } catch (error) {
         console.error('Upload error:', error);
         updateOutputWindow('Upload error: ' + error.message);
+    }
+}
+
+function showAssessmentResult(result, spellName) {
+    const statusLine = document.getElementById('status-line');
+    const gradeLine = document.getElementById('assessment-grade-line');
+    const gradeSpan = document.getElementById('assessment-grade');
+    const accLine = document.getElementById('assessment-accuracy-line');
+    const accSpan = document.getElementById('assessment-accuracy');
+    const textLine = document.getElementById('assessment-text-line');
+    const textSpan = document.getElementById('assessment-text');
+    const lastSpellName = document.getElementById('last-spell-name');
+    // const lastPronSpan = document.getElementById('last-pronunciation-text');
+
+    if (!result.success) {
+        if (statusLine) {
+            statusLine.textContent = 'Pronunciation assessment failed: ' + (result.error || 'Unknown error');
+        }
+        return;
+    }
+
+    if (statusLine) {
+        statusLine.textContent = `You cast ${spellName}!`;
+    }
+
+    if (lastSpellName) {
+        lastSpellName.textContent = spellName;
+    }
+
+    if (gradeLine && gradeSpan) {
+        gradeSpan.textContent = `${result.grade} – ${result.grade_label}`;
+        gradeLine.style.display = 'block';
+    }
+
+    if (accLine && accSpan && typeof result.accuracy_score === 'number') {
+        accSpan.textContent = `${result.accuracy_score.toFixed(1)} / 100`;
+        accLine.style.display = 'block';
+    }
+
+    if (textLine && textSpan) {
+        textSpan.textContent = result.recognized_text || '(no text recognized)';
+        textLine.style.display = 'block';
+    }
+}
+
+async function assessPronunciation(fileId, spellName) {
+    try {
+        const response = await fetch('/api/pronunciation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                file_id: fileId,
+                spell: spellName
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            updateOutputWindow('Pronunciation assessment failed: ' + (result.error || 'Unknown error'));
+            return;
+        }
+
+        showAssessmentResult(result, spellName);
+
+        const msgLines = [
+            `Spell: ${spellName}`,
+            `Recognized: ${result.recognized_text || '(no text)'}`,
+            `Grade: ${result.grade} – ${result.grade_label}`,
+        ];
+
+        updateOutputWindow(msgLines.join('\n'), spellName);
+
+        if (SPELL_ANIMATIONS[spellName] && (result.grade != 'T')) {
+            playSpellAnimation(spellName);
+        }
+
+    } catch (error) {
+        console.error('Assessment error:', error);
+        updateOutputWindow('Assessment error: ' + error.message);
     }
 }
 
@@ -755,5 +840,17 @@ document.addEventListener('DOMContentLoaded', () => {
     initSpeechRecognition();
     
     updateVoiceButton();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    const filterForm = document.querySelector(".filters form");
+    
+    document.querySelector("#spell-type").addEventListener("change", () => {
+        filterForm.submit();
+    });
+
+    document.querySelector("#difficulty").addEventListener("change", () => {
+        filterForm.submit();
+    });
 });
 

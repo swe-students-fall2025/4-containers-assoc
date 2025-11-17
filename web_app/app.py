@@ -3,14 +3,16 @@
 from itertools import product
 import os
 import sys
+from bson import ObjectId
 from flask import Flask, redirect, render_template, abort, request, jsonify, url_for
 from pymongo import MongoClient
+import tempfile
 
 sys.path.insert(
     0, os.path.join(os.path.dirname(__file__), "..")
 )
 from machine_learning_client.audio_store import AudioStore  # pylint: disable=wrong-import-position,import-error
-from machine_learning_client.pronun_assess import pronunciation_assessment  # pylint: disable=wrong-import-position,import-error
+from machine_learning_client.pronun_assess import convert_to_wav, pronunciation_assessment  # pylint: disable=wrong-import-position,import-error
 
 def create_app():
     app = Flask(__name__)
@@ -23,9 +25,14 @@ def create_app():
 
     @app.route("/")
     def index():
-        """Render the live recognition dashboard with a snapshot of stored spells."""
-        spells = list(spells_col.find({}, {"_id": 0}))
-        return render_template("index.html", spells=spells)
+        """Render the live recognition dashboard for a single selected spell."""
+        spell_name = request.args.get("spell")
+
+        current_spell = None
+        if spell_name:
+            current_spell = spells_col.find_one({"spell": spell_name}, {"_id": 0})
+
+        return render_template("index.html", spell=current_spell)
 
 
     @app.route("/spells")
@@ -46,10 +53,10 @@ def create_app():
             ]
         }
             
-            if t and t != "":
-                filter_r["type"] = t
-            if diff and diff != "":
-                filter_r["difficulty"] = diff
+        if t and t != "":
+            filter_r["type"] = t
+        if diff and diff != "":
+            filter_r["difficulty"] = diff
 
         spells = list(spells_col.find(filter_r, {"_id": 0}))
 
@@ -106,6 +113,41 @@ def create_app():
         except Exception as e:  # pylint: disable=broad-except
             return jsonify({"error": str(e)}), 500
 
+    @app.route("/api/pronunciation", methods=["POST"])
+    def assess_pronunciation():
+        """Assess pronunciation of uploaded audio file."""
+        try:
+            data = request.get_json(silent=True) or {}
+            file_id = data.get("file_id")
+            spell_name = data.get("spell")
+
+            if not file_id or not spell_name:
+                return jsonify({"error": "file_id and spell are required"}), 400
+            
+            spell_doc = spells_col.find_one({"spell": spell_name}, {"_id": 0})
+            if not spell_doc:
+                return jsonify({"error": "Spell not found"}), 404
+            
+            standard = spell_doc["spell"]
+
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
+                audio_store.load_audio_to_file(ObjectId(file_id), tmp)
+                user_audio = tmp.name
+
+            user_wav = convert_to_wav(user_audio)
+
+            result = pronunciation_assessment(standard, user_wav)
+
+            # clean up temp file
+            try:
+                os.remove(user_audio)
+            except OSError:
+                pass
+
+            return jsonify(result), (200 if result.get("success") else 500)
+
+        except Exception as e:  # pylint: disable=broad-except
+            return jsonify({"error": str(e)}), 500
     return app
 
 if __name__ == "__main__":
