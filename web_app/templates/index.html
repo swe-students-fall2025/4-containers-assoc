@@ -11,9 +11,10 @@
         <header class="app-header">
             <div class="app-header__inner">
                 <div class="brand">Holingo</div>
-                <form class="search-bar" role="search" aria-label="Spell search">
+                <form action="{{ url_for('spells_view') }}" method="get" class="search-bar" role="search" aria-label="Spell search">
                     <input
                         type="search"
+                        name="q"
                         placeholder="If you want search function..."
                         aria-label="Search spell name"
                     />

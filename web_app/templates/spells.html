@@ -10,16 +10,20 @@
         <header class="app-header">
             <div class="app-header__inner">
                 <div class="brand">Holingo</div>
-                <form class="search-bar" role="search" aria-label="Spell search">
+
+                {# SEARCH BAR: submits q only #}
+                <form action="{{ url_for('spells_view') }}" method="get" class="search-bar" role="search" aria-label="Spell search">
                     <input
                         type="search"
+                        name="q"
                         placeholder="Search spell by name..."
                         aria-label="Search spell name"
+                        value="{{ query or '' }}"
                     />
                     <button type="submit">Search</button>
                 </form>
-                <nav class="nav-links">
 
+                <nav class="nav-links">
                     <a href="{{ url_for('spells_view') }}" class="active">Spells</a>
                 </nav>
             </div>
@@ -28,28 +32,34 @@
             <section class="filters filters--inline" aria-label="Spell filters">
                 <h2>Filters</h2>
 
-                <div class="filters__group-container">
-                    <div class="filter-group">
-                        <label for="spell-type">Spell type</label>
-                        <select id="spell-type" name="spell-type">
-                            <option value="">All types</option>
-                            <option value="Charm">Charm</option>
-                            <option value="Curse">Curse</option>
-                            <option value="Healing">Healing</option>
-                            <option value="Defense">Defense</option>
-                        </select>
-                    </div>
+                <!-- Filter Bar -->
+                <form method="get" action="{{ url_for('spells_view') }}">
+                    {# keep current search query when changing filters #}
+                    <input type="hidden" name="q" value="{{ query or '' }}">
 
-                    <div class="filter-group">
-                        <label for="difficulty">Difficulty</label>
-                        <select id="difficulty" name="difficulty">
-                            <option value="">Any level</option>
-                            <option value="Beginner">Beginner</option>
-                            <option value="Intermediate">Intermediate</option>
-                            <option value="Advanced">Advanced</option>
-                        </select>
+                    <div class="filters__group-container">
+                        <div class="filter-group">
+                            <label for="spell-type">Spell type</label>
+                            <select id="spell-type" name="t">
+                                <option value="" {{ '' if not type else '' }}>All types</option>
+                                <option value="Charm" {{ 'selected' if type == 'Charm' else '' }}>Charm</option>
+                                <option value="Curse" {{ 'selected' if type == 'Curse' else '' }}>Curse</option>
+                                <option value="Healing" {{ 'selected' if type == 'Healing' else '' }}>Healing</option>
+                                <option value="Defense" {{ 'selected' if type == 'Defense' else '' }}>Defense</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="difficulty">Difficulty</label>
+                            <select id="difficulty" name="p">
+                                <option value="" {{ '' if not difficulty else '' }}>Any level</option>
+                                <option value="Beginner" {{ 'selected' if difficulty == 'Beginner' else '' }}>Beginner</option>
+                                <option value="Intermediate" {{ 'selected' if difficulty == 'Intermediate' else '' }}>Intermediate</option>
+                                <option value="Advanced" {{ 'selected' if difficulty == 'Advanced' else '' }}>Advanced</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
+                </form>
             </section>
 
             <section class="spell-list" aria-live="polite">
@@ -96,7 +106,20 @@
                 {% endif %}
             </section>
         </main>
-        <footer>Developed by Team Assoc.</footer>
+            <footer>Developed by Team Assoc.</footer>
     </body>
-</html>
 
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const filterForm = document.querySelector(".filters form");
+        
+        document.querySelector("#spell-type").addEventListener("change", () => {
+            filterForm.submit();
+        });
+
+        document.querySelector("#difficulty").addEventListener("change", () => {
+            filterForm.submit();
+        });
+    });
+    </script>
+</html>
