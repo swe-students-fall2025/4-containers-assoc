@@ -2,3 +2,6 @@ Flask
 pymongo
 python-dotenv
 dnspython
+azure-cognitiveservices-speech
+azure-identity
+azure-keyvault-secrets

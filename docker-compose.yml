@@ -10,16 +10,28 @@ services:
     volumes:
       - mongodb_data:/data/db
 
+  seed:
+    build: ./seed
+    container_name: seed
+    environment:
+      MONGO_URI: ${MONGO_URI}
+      DB_NAME: ${DB_NAME}
+    depends_on:
+      - mongodb
+
   web-app:
-    build: ./web-app
+    build:
+      context: .
+      dockerfile: web_app/Dockerfile
     container_name: web-app
     ports:
       - "5001:5001"
     environment:
-      MONGO_URI: mongodb://mongodb:27017
-      DB_NAME: harrypotter_spells
+      MONGO_URI: ${MONGO_URI}
+      DB_NAME: ${DB_NAME}
     depends_on:
-      - mongodb
+      - seed
 
 volumes:
   mongodb_data:
+

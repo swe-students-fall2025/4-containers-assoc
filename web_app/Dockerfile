@@ -1,20 +1,14 @@
-# Use an official Python base image
 FROM python:3.10-slim
 
-# Set work directory
 WORKDIR /app
 
-# Copy dependency files first (for caching)
-COPY requirements.txt .
+# Copy ONLY the contents of the web_app folder into the container
+COPY . /app
 
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install the web app dependencies
+RUN pip install --no-cache-dir -r web_app/requirements.txt
 
-# Copy the rest of your app
-COPY . .
+EXPOSE 5001
 
-# Expose port Flask will run on
-EXPOSE 5000
+CMD ["python", "web_app/app.py"]
 
-# Specify how to run the app
-CMD ["python", "app.py"]
