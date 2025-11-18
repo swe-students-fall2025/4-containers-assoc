@@ -90,7 +90,11 @@
                                 <td>{{ spell.type or "Unknown" }}</td>
                                 <td>{{ spell.difficulty or "Unspecified" }}</td>
                                 <td>
-                                    <a href="{{ url_for('index') }}?spell={{ spell.spell }}" class="try-spell-btn">
+                                    <a href="{% if current_user.is_authenticated %}
+                                                {{ url_for('index') }}?spell={{ spell.spell }}
+                                            {% else %}
+                                                {{ url_for('login') }}
+                                            {% endif %}" class="try-spell-btn">
                                         Try
                                     </a>
                                 </td>
