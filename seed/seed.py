@@ -1,24 +1,42 @@
 import json
 import os
-from pymongo import MongoClient
 import time
+from pymongo import MongoClient
+from pymongo.errors import ServerSelectionTimeoutError
 
-# Wait for Mongo to be available
-time.sleep(3)
+# Load connection settings with safe defaults for Docker
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://mongodb:27017")
+DB_NAME = os.getenv("DB_NAME", "harrypotter_spells")
 
-MONGO_URI = os.getenv("MONGO_URI")
-DB_NAME = os.getenv("DB_NAME")
+print(f"🔌 Connecting to MongoDB at: {MONGO_URI}")
 
-client = MongoClient(MONGO_URI)
+# Retry logic for MongoDB startup delay
+client = None
+for i in range(10):
+    try:
+        client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=2000)
+        client.server_info()  # Force a connection
+        print("🍃 MongoDB connection established!")
+        break
+    except ServerSelectionTimeoutError:
+        print(f"⏳ Mongo not ready, retrying... ({i+1}/10)")
+        time.sleep(2)
+
+if not client:
+    raise RuntimeError("❌ Could not connect to MongoDB")
+
 db = client[DB_NAME]
 collection = db["spells"]
 
-with open("./spells.json") as f:
-    data = json.load(f)
+# Load JSON data
+with open("spells.json", "r", encoding="utf-8") as f:
+    spells = json.load(f)
 
-if collection.count_documents({}) == 0:
-    collection.insert_many(data)
-    print("✨ Seeded spells collection successfully.")
+if isinstance(spells, list) and spells:
+    if collection.count_documents({}) == 0:
+        collection.insert_many(spells)
+        print(f"✨ Seeded {len(spells)} spells into '{DB_NAME}.spells'!")
+    else:
+        print("✔ Collection already contains data — skipping seeding.")
 else:
-    print("✔ Collection already has data — skipping seeding.")
-
+    print("⚠ spells.json does not appear to contain a list of spell docs.")

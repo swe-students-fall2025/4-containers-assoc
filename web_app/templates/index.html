@@ -40,19 +40,32 @@
                         <div class="output-section">
                             <h2>Recognition</h2>
                             <div class="output-window" aria-live="polite">
-                                <p>Awaiting voice input...</p>
-                                {% if spells %}
-                                <p>
-                                    <span class="spell-meta">Last stored spell:</span>
-                                    {{ spells[0].spell }}
+                                <p id="status-line">Awaiting voice input...</p>
+                                {% if spell %}
+                                <p id="current-spell-line">
+                                    <span class="spell-meta">Spell:</span>
+                                    <span id="current-spell-name">{{ spell.spell }}</span>
                                 </p>
-                                <p>
+                                <p id="current-pron-line">
                                     <span class="spell-meta">Pronunciation:</span>
-                                    {{ spells[0].pronunciation or "—" }}
+                                    <span id="current-pron-text">{{ spell.pronunciation or "—" }}</span>
                                 </p>
-                                {% else %}
-                                <p><span class="spell-meta">Spell library:</span> empty</p>
                                 {% endif %}
+
+                                <p id="assessment-grade-line" style="display:none;">
+                                <span class="spell-meta">Grade:</span>
+                                <span id="assessment-grade"></span>
+                                </p>
+
+                                <p id="assessment-accuracy-line" style="display:none;">
+                                <span class="spell-meta">Accuracy:</span>
+                                <span id="assessment-accuracy"></span>
+                                </p>
+
+                                <p id="assessment-text-line" style="display:none;">
+                                <span class="spell-meta">Recognized:</span>
+                                <span id="assessment-text"></span>
+                                </p>
                             </div>
                         </div>
                         <div class="control-bar">

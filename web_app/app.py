@@ -3,14 +3,18 @@
 from itertools import product
 import os
 import sys
+from bson import ObjectId
 from flask import Flask, redirect, render_template, abort, request, jsonify, url_for
+import requests
 from pymongo import MongoClient
+import tempfile
 
 sys.path.insert(
     0, os.path.join(os.path.dirname(__file__), "..")
 )
-from machine_learning_client.audio_store import AudioStore  # pylint: disable=wrong-import-position,import-error
-from machine_learning_client.pronun_assess import pronunciation_assessment  # pylint: disable=wrong-import-position,import-error
+# from machine_learning_client.audio_store import AudioStore  # pylint: disable=wrong-import-position,import-error
+# from machine_learning_client.pronun_assess import convert_to_wav, pronunciation_assessment  # pylint: disable=wrong-import-position,import-error
+ML_SERVICE_URL = os.getenv("ML_SERVICE_URL")
 
 def create_app():
     app = Flask(__name__)
@@ -19,16 +23,19 @@ def create_app():
     db = client[os.getenv("DB_NAME")]
     spells_col = db["spells"]
 
-    audio_store = AudioStore.from_env()
+    @app.route("/audio")
+    def index():
+        """Render the live recognition dashboard for a single selected spell."""
+        spell_name = request.args.get("spell")
+
+        current_spell = None
+        if spell_name:
+            current_spell = spells_col.find_one({"spell": spell_name}, {"_id": 0})
+
+        return render_template("index.html", spell=current_spell)
+
 
     @app.route("/")
-    def index():
-        """Render the live recognition dashboard with a snapshot of stored spells."""
-        spells = list(spells_col.find({}, {"_id": 0}))
-        return render_template("index.html", spells=spells)
-
-
-    @app.route("/spells")
     def spells_view():
         """Render the spell compendium page."""
         query = request.args.get("q")
@@ -46,10 +53,10 @@ def create_app():
             ]
         }
             
-            if t and t != "":
-                filter_r["type"] = t
-            if diff and diff != "":
-                filter_r["difficulty"] = diff
+        if t and t != "":
+            filter_r["type"] = t
+        if diff and diff != "":
+            filter_r["difficulty"] = diff
 
         spells = list(spells_col.find(filter_r, {"_id": 0}))
 
@@ -80,32 +87,41 @@ def create_app():
 
     @app.route("/api/audio", methods=["POST"])
     def upload_audio():
-        """Receive audio file from frontend and store it."""
+        """Receive audio file from frontend, forward to ml-client, return assessment result."""
         try:
             if "audio" not in request.files:
-                return jsonify({"error": "No audio file provided"}), 400
+                return jsonify({"success": False, "error": "No audio file provided"}), 400
 
             audio_file = request.files["audio"]
-            spell_name = request.form.get("spell", "Unknown")
+            spell_name = request.form.get("spell") or "Unknown"
 
-            if audio_file.filename == "":
-                return jsonify({"error": "No file selected"}), 400
+            files = {
+                "audio": (audio_file.filename, audio_file.stream, audio_file.mimetype or "audio/webm")
+            }
+            data = {"spell": spell_name}
 
-            file_id = audio_store.save_audio(
-                audio_file.stream,
-                spell=spell_name,
-                filename=audio_file.filename,
-                content_type=audio_file.content_type or "audio/webm",
+            # Send to ml-client container
+            ml_resp = requests.post(
+                ML_SERVICE_URL + "/assess",
+                files=files,
+                data=data,
+                timeout=60,
             )
 
-            return (
-                jsonify({"success": True, "file_id": str(file_id), "spell": spell_name}),
-                200,
-            )
+            try:
+                ml_result = ml_resp.json()
+            except ValueError:
+                return jsonify({"success": False, "error": "Invalid response from ML service"}), 500
 
-        except Exception as e:  # pylint: disable=broad-except
-            return jsonify({"error": str(e)}), 500
+            # 🔹 Ensure spell is always present in the response
+            ml_result["spell"] = spell_name
 
+            # Always 200 here; "success" is in the JSON
+            return jsonify(ml_result), 200
+
+        except Exception as e:  # noqa: BLE001
+            return jsonify({"success": False, "error": str(e)}), 500
+        
     return app
 
 if __name__ == "__main__":

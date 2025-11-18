@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 azure-cognitiveservices-speech = "*"
+pydub = "*"
 
 [dev-packages]
 black = "*"

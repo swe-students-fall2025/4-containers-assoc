@@ -96,3 +96,12 @@ class AudioStore:
     def get_attempts_by_spell(self, spell: str):
         """Get all pronunciation attempts for a specific spell."""
         return list(self._attempts_col.find({"spell": spell}).sort("recorded_at", -1))
+    
+    def load_audio_to_file(self, file_id, file_obj):
+        """
+        Read audio from GridFS and write it into an open file object.
+        `file_obj` is an already-open file handle (e.g. NamedTemporaryFile).
+        """
+        grid_out = self._fs.get(file_id)   # assuming self._fs is your GridFS instance
+        file_obj.write(grid_out.read())
+        file_obj.flush()
