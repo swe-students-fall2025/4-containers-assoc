@@ -549,8 +549,9 @@ function startRecording() {
     mediaRecorder.start();
     isRecording = true;
     const spellName = currentSpell || 'Unknown spell';
+    const pronunciation = currentSpell.pronunciation || "-";
     if (currentSpell) {
-        updateOutputWindow(`Recording "${spellName}"... Click to stop.`, spellName);
+        updateOutputWindow(`Recording ... Click to stop. \n Spell: "${spellName}" \n Pronunciation: "${pronunciation}"`, spellName, pronunciation);
     } else {
         updateOutputWindow('Recording... Click to stop and upload.');
     }
@@ -587,14 +588,37 @@ async function uploadAudio() {
         });
         
         const result = await response.json();
-        
-        if (response.ok && result.success) {
-            updateOutputWindow(`Audio uploaded successfully for spell: ${result.spell}. Calculating your score ...`, result.spell);
-            if (result.file_id && result.spell) {
-                await assessPronunciation(result.file_id, result.spell);
+        console.log('ML result:', result);
+
+        if (!response.ok) {
+            updateOutputWindow('Upload error: ' + (result.error || 'Unknown error'));
+            return;
+        }
+
+        const displaySpell = result.spell || spellName;
+
+        if (result.success) {
+            const displaySpell = result.spell || spellName;
+            const recognized = result.recognized_text || '(no speech recognized)';
+            const grade = result.grade || 'N/A';
+            const comment = result.grade_label || '';
+
+            updateOutputWindow(
+                `Spell: ${displaySpell}\n` +
+                `You said: "${recognized}"\n` +
+                `Grade: ${grade} – ${comment}`,
+                displaySpell
+            );
+
+            if (currentSpell && SPELL_ANIMATIONS[currentSpell]) {
+                playSpellAnimation(currentSpell);
             }
         } else {
-            updateOutputWindow('Upload failed: ' + (result.error || 'Unknown error'));
+            updateOutputWindow(
+                `We couldn't recognize your spell "${displaySpell}". ` +
+                (result.error || 'Please try again.'),
+                displaySpell
+            );
         }
     } catch (error) {
         console.error('Upload error:', error);
@@ -606,17 +630,17 @@ function showAssessmentResult(result, spellName) {
     const statusLine = document.getElementById('status-line');
     const gradeLine = document.getElementById('assessment-grade-line');
     const gradeSpan = document.getElementById('assessment-grade');
-    const accLine = document.getElementById('assessment-accuracy-line');
-    const accSpan = document.getElementById('assessment-accuracy');
     const textLine = document.getElementById('assessment-text-line');
     const textSpan = document.getElementById('assessment-text');
-    const lastSpellName = document.getElementById('last-spell-name');
-    // const lastPronSpan = document.getElementById('last-pronunciation-text');
+    const currentSpellNameSpan = document.getElementById('current-spell-name');
 
     if (!result.success) {
         if (statusLine) {
-            statusLine.textContent = 'Pronunciation assessment failed: ' + (result.error || 'Unknown error');
+            statusLine.textContent =
+                'Pronunciation assessment failed: ' + (result.error || 'Unknown error');
         }
+        if (gradeLine) gradeLine.style.display = 'none';
+        if (textLine) textLine.style.display = 'none';
         return;
     }
 
@@ -624,8 +648,8 @@ function showAssessmentResult(result, spellName) {
         statusLine.textContent = `You cast ${spellName}!`;
     }
 
-    if (lastSpellName) {
-        lastSpellName.textContent = spellName;
+    if (currentSpellNameSpan) {
+        currentSpellNameSpan.textContent = spellName;
     }
 
     if (gradeLine && gradeSpan) {
@@ -633,13 +657,9 @@ function showAssessmentResult(result, spellName) {
         gradeLine.style.display = 'block';
     }
 
-    if (accLine && accSpan && typeof result.accuracy_score === 'number') {
-        accSpan.textContent = `${result.accuracy_score.toFixed(1)} / 100`;
-        accLine.style.display = 'block';
-    }
-
     if (textLine && textSpan) {
-        textSpan.textContent = result.recognized_text || '(no text recognized)';
+        const recognized = result.recognized_text || '(no text recognized)';
+        textSpan.textContent = recognized;
         textLine.style.display = 'block';
     }
 }
@@ -719,65 +739,19 @@ function updateOutputWindow(message, spellName = null) {
     const outputWindow = document.querySelector('.output-window');
     if (!outputWindow) return;
 
-    const firstP = outputWindow.querySelector('p');
-    if (firstP) {
-        firstP.textContent = message;
-    }
-    
+    // Clear previous content
+    outputWindow.innerHTML = '';
+
+    // Main status / feedback line
+    const msgP = document.createElement('p');
+    msgP.textContent = message;
+    outputWindow.appendChild(msgP);
+
+    // Optional: show which spell the user is working on
     if (spellName) {
-        loadSpellData().then(spellData => {
-            if (spellData) {
-                const spell = spellData.find(s => s.spell === spellName);
-                if (spell) {
-                    const allPs = outputWindow.querySelectorAll('p');
-                    
-                    let spellP = Array.from(allPs).find(p => 
-                        p.textContent.includes('Last stored spell') || 
-                        p.textContent.includes('Pronunciation:')
-                    );
-                    
-                    if (spellP && spellP.textContent.includes('Last stored spell')) {
-                        spellP.innerHTML = `<span class="spell-meta">Last stored spell:</span> ${spell.spell}`;
-                    } else {
-                        spellP = document.createElement('p');
-                        spellP.innerHTML = `<span class="spell-meta">Last stored spell:</span> ${spell.spell}`;
-                        outputWindow.appendChild(spellP);
-                    }
-                    
-                    let pronP = Array.from(allPs).find(p => 
-                        p.textContent.includes('Pronunciation:')
-                    );
-                    
-                    if (pronP) {
-                        pronP.innerHTML = `<span class="spell-meta">Pronunciation:</span> ${spell.pronunciation || "—"}`;
-                    } else {
-                        pronP = document.createElement('p');
-                        pronP.innerHTML = `<span class="spell-meta">Pronunciation:</span> ${spell.pronunciation || "—"}`;
-                        outputWindow.appendChild(pronP);
-                    }
-                    
-                    allPs.forEach(p => {
-                        if (p !== firstP && 
-                            !p.textContent.includes(spell.spell) && 
-                            !p.textContent.includes('Pronunciation:') &&
-                            !p.textContent.includes('Last stored spell') &&
-                            !p.textContent.includes('spell library')) {
-                            p.remove();
-                        }
-                    });
-                }
-            }
-        });
-    } else {
-        const allPs = outputWindow.querySelectorAll('p');
-        allPs.forEach((p, index) => {
-            if (index > 0 && 
-                (p.textContent.includes('Last stored spell') || 
-                 p.textContent.includes('Pronunciation:') ||
-                 p.textContent.includes('spell library'))) {
-                p.remove();
-            }
-        });
+        const spellP = document.createElement('p');
+        spellP.innerHTML = `<span class="spell-meta">Spell:</span> ${spellName}`;
+        outputWindow.appendChild(spellP);
     }
 }
 

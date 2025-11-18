@@ -27,13 +27,6 @@
     "difficulty": "Advanced"
   },
   {
-    "spell": "Imperio",
-    "pronunciation": "im-PAIR-ee-oh",
-    "description": "Places the victim completely under the caster’s control.",
-    "type": "Curse",
-    "difficulty": "Advanced"
-  },
-  {
     "spell": "Expelliarmus",
     "pronunciation": "ex-PELL-ee-AR-mus",
     "description": "Disarms an opponent, forcing them to release what they’re holding.",
@@ -76,13 +69,6 @@
     "difficulty": "Intermediate"
   },
   {
-    "spell": "Protego",
-    "pronunciation": "pro-TAY-go",
-    "description": "Creates a magical shield to deflect spells.",
-    "type": "Defense",
-    "difficulty": "Intermediate"
-  },
-  {
     "spell": "Stupefy",
     "pronunciation": "STEW-peh-fye",
     "description": "Stuns the target, rendering them unconscious.",
@@ -109,13 +95,6 @@
     "description": "Slices or rips the target object.",
     "type": "Charm",
     "difficulty": "Intermediate"
-  },
-  {
-    "spell": "Episkey",
-    "pronunciation": "eh-PIS-key",
-    "description": "Heals minor injuries like cuts or broken noses.",
-    "type": "Healing",
-    "difficulty": "Beginner"
   },
   {
     "spell": "Reparo",
@@ -184,13 +163,6 @@
     "spell": "Impervius",
     "pronunciation": "im-PUR-vee-us",
     "description": "Makes objects repel water and other substances.",
-    "type": "Charm",
-    "difficulty": "Beginner"
-  },
-  {
-    "spell": "Scourgify",
-    "pronunciation": "SKUR-ji-fye",
-    "description": "Cleans an object.",
     "type": "Charm",
     "difficulty": "Beginner"
   },

@@ -1,0 +1,9 @@
+azure-cognitiveservices-speech
+azure-core
+pydub
+pymongo
+python-dotenv
+fastapi
+uvicorn[standard]
+requests
+python-multipart

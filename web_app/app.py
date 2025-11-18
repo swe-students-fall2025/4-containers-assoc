@@ -5,14 +5,16 @@ import os
 import sys
 from bson import ObjectId
 from flask import Flask, redirect, render_template, abort, request, jsonify, url_for
+import requests
 from pymongo import MongoClient
 import tempfile
 
 sys.path.insert(
     0, os.path.join(os.path.dirname(__file__), "..")
 )
-from machine_learning_client.audio_store import AudioStore  # pylint: disable=wrong-import-position,import-error
-from machine_learning_client.pronun_assess import convert_to_wav, pronunciation_assessment  # pylint: disable=wrong-import-position,import-error
+# from machine_learning_client.audio_store import AudioStore  # pylint: disable=wrong-import-position,import-error
+# from machine_learning_client.pronun_assess import convert_to_wav, pronunciation_assessment  # pylint: disable=wrong-import-position,import-error
+ML_SERVICE_URL = os.getenv("ML_SERVICE_URL")
 
 def create_app():
     app = Flask(__name__)
@@ -21,9 +23,7 @@ def create_app():
     db = client[os.getenv("DB_NAME")]
     spells_col = db["spells"]
 
-    audio_store = AudioStore.from_env()
-
-    @app.route("/")
+    @app.route("/audio")
     def index():
         """Render the live recognition dashboard for a single selected spell."""
         spell_name = request.args.get("spell")
@@ -35,7 +35,7 @@ def create_app():
         return render_template("index.html", spell=current_spell)
 
 
-    @app.route("/spells")
+    @app.route("/")
     def spells_view():
         """Render the spell compendium page."""
         query = request.args.get("q")
@@ -87,67 +87,41 @@ def create_app():
 
     @app.route("/api/audio", methods=["POST"])
     def upload_audio():
-        """Receive audio file from frontend and store it."""
+        """Receive audio file from frontend, forward to ml-client, return assessment result."""
         try:
             if "audio" not in request.files:
-                return jsonify({"error": "No audio file provided"}), 400
+                return jsonify({"success": False, "error": "No audio file provided"}), 400
 
             audio_file = request.files["audio"]
-            spell_name = request.form.get("spell", "Unknown")
+            spell_name = request.form.get("spell") or "Unknown"
 
-            if audio_file.filename == "":
-                return jsonify({"error": "No file selected"}), 400
+            files = {
+                "audio": (audio_file.filename, audio_file.stream, audio_file.mimetype or "audio/webm")
+            }
+            data = {"spell": spell_name}
 
-            file_id = audio_store.save_audio(
-                audio_file.stream,
-                spell=spell_name,
-                filename=audio_file.filename,
-                content_type=audio_file.content_type or "audio/webm",
+            # Send to ml-client container
+            ml_resp = requests.post(
+                ML_SERVICE_URL + "/assess",
+                files=files,
+                data=data,
+                timeout=60,
             )
 
-            return (
-                jsonify({"success": True, "file_id": str(file_id), "spell": spell_name}),
-                200,
-            )
-
-        except Exception as e:  # pylint: disable=broad-except
-            return jsonify({"error": str(e)}), 500
-
-    @app.route("/api/pronunciation", methods=["POST"])
-    def assess_pronunciation():
-        """Assess pronunciation of uploaded audio file."""
-        try:
-            data = request.get_json(silent=True) or {}
-            file_id = data.get("file_id")
-            spell_name = data.get("spell")
-
-            if not file_id or not spell_name:
-                return jsonify({"error": "file_id and spell are required"}), 400
-            
-            spell_doc = spells_col.find_one({"spell": spell_name}, {"_id": 0})
-            if not spell_doc:
-                return jsonify({"error": "Spell not found"}), 404
-            
-            standard = spell_doc["spell"]
-
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
-                audio_store.load_audio_to_file(ObjectId(file_id), tmp)
-                user_audio = tmp.name
-
-            user_wav = convert_to_wav(user_audio)
-
-            result = pronunciation_assessment(standard, user_wav)
-
-            # clean up temp file
             try:
-                os.remove(user_audio)
-            except OSError:
-                pass
+                ml_result = ml_resp.json()
+            except ValueError:
+                return jsonify({"success": False, "error": "Invalid response from ML service"}), 500
 
-            return jsonify(result), (200 if result.get("success") else 500)
+            # 🔹 Ensure spell is always present in the response
+            ml_result["spell"] = spell_name
 
-        except Exception as e:  # pylint: disable=broad-except
-            return jsonify({"error": str(e)}), 500
+            # Always 200 here; "success" is in the JSON
+            return jsonify(ml_result), 200
+
+        except Exception as e:  # noqa: BLE001
+            return jsonify({"success": False, "error": str(e)}), 500
+        
     return app
 
 if __name__ == "__main__":

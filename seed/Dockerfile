@@ -2,8 +2,8 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-COPY spells.json .
-COPY seed.py .
+COPY seed/spells.json .
+COPY seed/seed.py .
 
 RUN pip install pymongo
 
