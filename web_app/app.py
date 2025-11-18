@@ -4,26 +4,32 @@ from itertools import product
 import os
 import sys
 from bson import ObjectId
-from flask import Flask, redirect, render_template, abort, request, jsonify, url_for
+from flask import Flask, redirect, render_template, abort, request, jsonify, url_for, flash
 import requests
 from pymongo import MongoClient
-import tempfile
+from flask_login import LoginManager, login_user, logout_user, current_user, login_required
+from models import User
 
-sys.path.insert(
-    0, os.path.join(os.path.dirname(__file__), "..")
-)
-# from machine_learning_client.audio_store import AudioStore  # pylint: disable=wrong-import-position,import-error
-# from machine_learning_client.pronun_assess import convert_to_wav, pronunciation_assessment  # pylint: disable=wrong-import-position,import-error
+login_manager = LoginManager()
+
 ML_SERVICE_URL = os.getenv("ML_SERVICE_URL")
 
 def create_app():
     app = Flask(__name__)
+    login_manager.init_app(app) # config login manager for login
+    login_manager.login_view = "login" 
 
     client = MongoClient(os.getenv("MONGO_URI"))
     db = client[os.getenv("DB_NAME")]
     spells_col = db["spells"]
 
+    @login_manager.user_loader
+    def load_user(user_id):
+        db_user = app.db.users.find_one({"_id": ObjectId(user_id)})
+        return User(db_user) if db_user else None
+
     @app.route("/audio")
+    @login_required
     def index():
         """Render the live recognition dashboard for a single selected spell."""
         spell_name = request.args.get("spell")
@@ -86,6 +92,7 @@ def create_app():
 
 
     @app.route("/api/audio", methods=["POST"])
+    @login_required
     def upload_audio():
         """Receive audio file from frontend, forward to ml-client, return assessment result."""
         try:
@@ -100,7 +107,6 @@ def create_app():
             }
             data = {"spell": spell_name}
 
-            # Send to ml-client container
             ml_resp = requests.post(
                 ML_SERVICE_URL + "/assess",
                 files=files,
@@ -113,14 +119,79 @@ def create_app():
             except ValueError:
                 return jsonify({"success": False, "error": "Invalid response from ML service"}), 500
 
-            # 🔹 Ensure spell is always present in the response
             ml_result["spell"] = spell_name
-
-            # Always 200 here; "success" is in the JSON
             return jsonify(ml_result), 200
 
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             return jsonify({"success": False, "error": str(e)}), 500
+        
+    @app.route('/login', methods=['GET', 'POST'])
+    def login():
+        if request.method == "POST":
+            email = request.form.get("email")
+            password = request.form.get("password")
+
+            if not email or not password:
+                flash("Please fill in both fields!")
+                return redirect(url_for("login"))
+            
+            db_email = db.users.find_one({"email": email})
+            # no such user
+            if not db_email:
+                flash("Email not registered.")
+                return redirect(url_for("login"))
+            
+            if db_email["password"] == password:
+                user = User(db_email)
+                login_user(user)              
+                return redirect(url_for("profile"))
+            else:
+                flash("Wrong password!")
+                return redirect(url_for("login"))
+            
+        return render_template("login.html")
+    
+    @app.route("/logout")
+    @login_required
+    def logout():
+        logout_user()
+        return redirect(url_for("spells_view"))
+
+    @app.route('/register', methods = ['GET', 'POST'])
+    def register():
+        if request.method == 'POST':
+            username = request.form.get("username")
+            email = request.form.get("email")
+            password = request.form.get("password")
+
+            if not username or not email or not password:
+                flash("Please fill in all fields!")
+                return redirect(url_for("register"))
+            
+            db_email = db.users.find_one({"email": email})
+            if db_email:
+                flash("Email already registered!")
+                return redirect(url_for("register"))
+        
+            new_user = ({
+                "username": username,
+                "email": email,
+                "password": password,
+            })
+            doc = db.users.insert_one(new_user)
+
+            user_doc = db.users.find_one({"_id": doc.inserted_id})
+            user = User(user_doc)
+            login_user(user)
+
+            return redirect(url_for("profile"))
+        return render_template("register.html")
+    
+    @app.route("/profile")
+    @login_required
+    def profile():
+        userdata = db.users.find_one({"_id": ObjectId(current_user.id)})
+        return render_template("profile.html", user = userdata)
         
     return app
 

@@ -88,24 +88,6 @@ def pronunciation_assessment(reference_text, user_audio):
         "grade": grade_info["grade"],
         "grade_label": grade_info["label"],
     }
-'''
-if __name__ == "__main__":
-    test_cases = [
-        "Obscuro",
-        "Avada Kedavra",
-    ]
-
-    for standard in test_cases:
-        input(f"\nPress Enter, then say: {standard} ... ")
-        result = pronunciation_assessment(standard,"")
-
-        if result["success"]:
-            print(f"\nResult for '{standard}':")
-            print("  Recognized:", result["recognized_text"])
-            print("  Accuracy:  ", result["accuracy_score"])
-        else:
-            print(f"\nError for '{standard}': {result['error']}")
-'''
 
 def convert_to_wav(src_path: str) -> str:
     """

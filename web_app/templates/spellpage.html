@@ -55,7 +55,14 @@
         </div>
 
         <div style="margin-top: 1.5rem; text-align: center;">
-          <a href="{{ url_for('index') }}?spell={{ spell.spell }}" class="try-spell-btn">
+          <a
+            href="{% if current_user.is_authenticated %}
+                    {{ url_for('index') }}?spell={{ spell.spell }}
+                  {% else %}
+                    {{ url_for('login') }}
+                  {% endif %}"
+            class="try-spell-btn"
+          >
             Try
           </a>
         </div>
