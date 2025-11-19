@@ -1,4 +1,7 @@
 import sys
+import os
+os.environ["SPEECH_KEY"] = "fake_key"
+os.environ["SPEECH_REGION"] = "fake_region"
 from unittest.mock import MagicMock
 
 sys.modules['audioop'] = MagicMock()
