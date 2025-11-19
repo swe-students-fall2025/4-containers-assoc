@@ -17,5 +17,6 @@ requests = "*"
 pytest = "*"
 pytest-flask = "*"
 pytest-cov = "*"
+exceptiongroup = "*"
 
 
