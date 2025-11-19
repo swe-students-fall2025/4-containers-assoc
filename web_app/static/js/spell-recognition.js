@@ -610,6 +610,7 @@ async function uploadAudio() {
 
             updateOutputWindow(
                 `Spell: ${displaySpell}<br>` +
+                // `You said: "${recognized}"<br>` +
                 `Grade: ${grade} – ${comment}`,
                 displaySpell
             );
