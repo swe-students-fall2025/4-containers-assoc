@@ -5,35 +5,49 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        # Only run for web_app for now
-        subdir: [web_app]
+
+    services:
+      mongo:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongo --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      MONGO_URI: mongodb://localhost:27017
+      DB_NAME: test_db
+      SECRET_KEY: test_secret
+      ML_SERVICE_URL: http://localhost:5002  # just a placeholder
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
-      - name: Install dependencies
+      - name: Install pipenv
         run: |
-          cd ${{ matrix.subdir }}
           python -m pip install --upgrade pip
           pip install pipenv
-          pipenv --python 3.10
-          pipenv install --dev
+
+      - name: Install dependencies
+        working-directory: web_app
+        run: pipenv install --dev
 
       - name: Run unit tests with coverage
-        run: |
-          cd ${{ matrix.subdir }}
-          pipenv run python -m pytest flaskTests.py --cov=. --cov-fail-under=80
+        working-directory: web_app
+        run: pipenv run python -m pytest flaskTests.py --cov=. --cov-fail-under=80
 
       - name: Upload coverage report
-        if: success() || failure()
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: ${{ matrix.subdir }}/htmlcov/
+          path: web_app/htmlcov/

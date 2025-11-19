@@ -20,8 +20,8 @@ def create_app():
     login_manager.init_app(app) # config login manager for login
     login_manager.login_view = "login" 
 
-    client = MongoClient(os.getenv("MONGO_URI"))
-    app.db = client[os.getenv("DB_NAME")]
+    client = MongoClient(os.getenv("MONGO_URI", "mongodb://localhost:27017"))
+    app.db = client[os.getenv("DB_NAME", "default_db")]
     app.spells_col = app.db["spells"]
 
     @login_manager.user_loader
