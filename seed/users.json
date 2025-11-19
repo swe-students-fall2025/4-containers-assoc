@@ -1,0 +1,12 @@
+[
+  {
+    "username": "Harry",
+    "email": "harry@hogwarts.edu",
+    "password": "harrypotter"
+  },
+  {
+    "username": "Hermione",
+    "email": "hermione@hogwarts.edu",
+    "password": "hermionegranger"
+  }
+]
