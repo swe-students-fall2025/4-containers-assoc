@@ -12,6 +12,7 @@ from app import create_app, User
 def client():
     app = create_app()
     app.config['TESTING'] = True
+    app.config['SECRET_KEY'] = "test_secret"
     with app.test_client() as client:
         yield client
 
@@ -21,9 +22,9 @@ def test_register_post_new_user(client):
 
     def find_one_side_effect(query):
         if query.get("email") == "hermione@gmail.com":
-            return None  # Email not registered yet
+            return None
         if "_id" in query:
-            return new_user_data  # Fetch inserted user
+            return new_user_data
         return None
 
     with patch.object(client.application, 'db', new=MagicMock()) as mock_db:
@@ -82,15 +83,12 @@ def test_profile_route(client):
 
     with patch.object(client.application, 'db', new=MagicMock()) as mock_db:
         mock_db.users.find_one.return_value = user_doc
-
-        # Manually set the session for Flask-Login
         with client.session_transaction() as sess:
-            sess['_user_id'] = str(mock_id)  # Flask-Login uses '_user_id'
+            sess['_user_id'] = str(mock_id)
 
         response = client.get('/profile', follow_redirects=True)
         assert response.status_code == 200
         assert b"Harry" in response.data
-
 
 
 def test_spell_view_found(client):
@@ -115,5 +113,38 @@ def test_api_spells(client):
         assert response.status_code == 200
         assert b"Expelliarmus" in response.data
         assert b"Lumos" in response.data
+
+
+def test_profile_requires_login(client):
+    response = client.get('/profile', follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Please log in" in response.data
+
+def test_spells_view_filters(client):
+    spells_list = [{"spell": "Alohomora"}, {"spell": "Expelliarmus"}]
+    with patch.object(client.application, 'spells_col', new=MagicMock()) as mock_col:
+        mock_col.find.return_value = spells_list
+        response = client.get('/?q=Alohomora&t=magic&p=easy')
+        assert response.status_code == 200
+        assert b"Alohomora" in response.data
+
+def test_register_login_get_pages(client):
+    response = client.get('/register')
+    assert response.status_code == 200
+    assert b"Register" in response.data  
+
+    response = client.get('/login')
+    assert response.status_code == 200
+    assert b"Login" in response.data
+    
+def test_register_post_missing_fields(client):
+    response = client.post('/register', data={}, follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Please fill in all fields!" in response.data
+
+def test_login_post_missing_fields(client):
+    response = client.post('/login', data={}, follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Please fill in both fields!" in response.data
 
 
