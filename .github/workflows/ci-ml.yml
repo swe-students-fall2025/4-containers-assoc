@@ -41,7 +41,7 @@ jobs:
         working-directory: machine_learning_client
         run: |
           pytest \
-            --cov=. \
+            --cov=machine_learning_client \
             --cov-report=term-missing \
             --cov-fail-under=80 \
             --import-mode=importlib \
