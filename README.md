@@ -60,8 +60,8 @@ pipenv run black .
 pipenv run pylint **/*.py
 
 # Run tests with coverage
-pipenv run pytest machine_learning_client/tests \
-            --cov=machine_learning_client \
+pipenv run pytest \
+            --cov=. \
             --cov-report=term-missing \
             --cov-fail-under=80 \
             --import-mode=importlib
