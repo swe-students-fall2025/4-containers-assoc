@@ -7,11 +7,16 @@ name = "pypi"
 pylint = "*"
 black = "*"
 flask = "*"
+flask-login = "*"
 pymongo = "*"
 python-dotenv = "*"
 dnspython = "*"
+requests = "*"
 
 [dev-packages]
+pytest = "*"
+pytest-flask = "*"
+pytest-cov = "*"
+exceptiongroup = "*"
 
-[requires]
-python_version = "3.10"
+

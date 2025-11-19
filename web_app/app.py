@@ -1,14 +1,14 @@
 """Flask web application that allows user to check Harry Potter spell pronunciation."""
 
-from itertools import product
 import os
-import sys
 from bson import ObjectId
 from flask import Flask, redirect, render_template, abort, request, jsonify, url_for, flash
 import requests
 from pymongo import MongoClient
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 from models import User
+from dotenv import load_dotenv
+load_dotenv()
 
 login_manager = LoginManager()
 
@@ -20,13 +20,13 @@ def create_app():
     login_manager.init_app(app) # config login manager for login
     login_manager.login_view = "login" 
 
-    client = MongoClient(os.getenv("MONGO_URI"))
-    db = client[os.getenv("DB_NAME")]
-    spells_col = db["spells"]
+    client = MongoClient(os.getenv("MONGO_URI", "mongodb://localhost:27017"))
+    app.db = client[os.getenv("DB_NAME", "default_db")]
+    app.spells_col = app.db["spells"]
 
     @login_manager.user_loader
     def load_user(user_id):
-        db_user = db.users.find_one({"_id": ObjectId(user_id)})
+        db_user = app.db.users.find_one({"_id": ObjectId(user_id)})
         return User(db_user) if db_user else None
 
     @app.route("/audio")
@@ -37,7 +37,7 @@ def create_app():
 
         current_spell = None
         if spell_name:
-            current_spell = spells_col.find_one({"spell": spell_name}, {"_id": 0})
+            current_spell = app.spells_col.find_one({"spell": spell_name}, {"_id": 0})
 
         return render_template("index.html", spell=current_spell)
 
@@ -65,7 +65,7 @@ def create_app():
         if diff and diff != "":
             filter_r["difficulty"] = diff
 
-        spells = list(spells_col.find(filter_r, {"_id": 0}))
+        spells = list(app.spells_col.find(filter_r, {"_id": 0}))
 
         return render_template(
             "spells.html",
@@ -79,7 +79,7 @@ def create_app():
     @app.route("/spells/<spell_name>")
     def spell_view(spell_name):
         """Render detail view for a single spell."""
-        spell = spells_col.find_one({"spell": spell_name}, {"_id": 0})
+        spell = app.spells_col.find_one({"spell": spell_name}, {"_id": 0})
         if not spell:
             abort(404)
         return render_template("spellpage.html", spell=spell)
@@ -88,7 +88,7 @@ def create_app():
     @app.route("/api/spells", methods=["GET"])
     def get_spells():
         """Return all spells as JSON."""
-        spells = list(spells_col.find({}, {"_id": 0}))
+        spells = list(app.spells_col.find({}, {"_id": 0}))
         return jsonify(spells)
 
 
@@ -136,7 +136,7 @@ def create_app():
                 flash("Please fill in both fields!")
                 return redirect(url_for("login"))
             
-            db_email = db.users.find_one({"email": email})
+            db_email = app.db.users.find_one({"email": email})
             # no such user
             if not db_email:
                 flash("Email not registered.")
@@ -169,7 +169,7 @@ def create_app():
                 flash("Please fill in all fields!")
                 return redirect(url_for("register"))
             
-            db_email = db.users.find_one({"email": email})
+            db_email = app.db.users.find_one({"email": email})
             if db_email:
                 flash("Email already registered!")
                 return redirect(url_for("register"))
@@ -179,9 +179,9 @@ def create_app():
                 "email": email,
                 "password": password,
             })
-            doc = db.users.insert_one(new_user)
+            doc = app.db.users.insert_one(new_user)
 
-            user_doc = db.users.find_one({"_id": doc.inserted_id})
+            user_doc = app.db.users.find_one({"_id": doc.inserted_id})
             user = User(user_doc)
             login_user(user)
 
@@ -191,7 +191,7 @@ def create_app():
     @app.route("/profile")
     @login_required
     def profile():
-        userdata = db.users.find_one({"_id": ObjectId(current_user.id)})
+        userdata = app.db.users.find_one({"_id": ObjectId(current_user.id)})
         return render_template("profile.html", user = userdata)
         
     return app
