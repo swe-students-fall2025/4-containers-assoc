@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import MagicMock, patch
 from io import BytesIO
 from bson import ObjectId
-from audio_store import AudioStore
+from ..audio_store import AudioStore
 
 
 @pytest.fixture
@@ -12,11 +12,19 @@ def mock_mongo():
     mock_attempts_col = MagicMock()
     mock_db.__getitem__.return_value = mock_attempts_col
 
+    mock_client.__getitem__.return_value = mock_db
+
     mock_gridfs_instance = MagicMock()
 
-    with patch("audio_store.MongoClient", return_value=mock_client) as mock_client_class, \
-         patch("audio_store.GridFS", return_value=mock_gridfs_instance) as mock_gridfs_class:
-        yield mock_client, mock_db, mock_gridfs_instance, mock_attempts_col
+    with patch(
+        "machine_learning_client.audio_store.MongoClient",
+        return_value=mock_client,
+    ) as mock_client_class, patch(
+        "machine_learning_client.audio_store.GridFS",
+        return_value=mock_gridfs_instance,
+    ) as mock_gridfs_class:
+        # yield whatever your tests expect
+        yield mock_client, mock_db, mock_attempts_col, mock_gridfs_instance
 
 def test_save_audio_basic(mock_mongo):
     _, mock_db, mock_gridfs, mock_attempts_col = mock_mongo

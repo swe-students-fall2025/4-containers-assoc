@@ -4,15 +4,18 @@ from io import BytesIO
 from unittest.mock import Mock, patch
 from bson import ObjectId
 from fastapi.testclient import TestClient
+from .. import convert
 
 os.environ["SPEECH_KEY"] = "fake_key"
 os.environ["SPEECH_REGION"] = "fake_region"
 
-with patch("audio_store.AudioStore.from_env") as mock_from_env:
-    mock_store = Mock()
-    mock_from_env.return_value = mock_store
-    import convert
-    convert.audio_store = mock_store
+@pytest.fixture(autouse=True)
+def _fake_env(monkeypatch):
+    monkeypatch.setenv("SPEECH_KEY", "fake_key")
+    monkeypatch.setenv("SPEECH_REGION", "fake_region")
+    # If your AudioStore.from_env() uses these:
+    # monkeypatch.setenv("MONGO_URI", "mongodb://fake")
+    # monkeypatch.setenv("DB_NAME", "testdb")
 
 
 @pytest.fixture
@@ -21,11 +24,17 @@ def client():
 
 
 @pytest.fixture
-def mock_dependencies():
-    with patch("convert.audio_store") as mock_store, \
-         patch("convert.convert_to_wav") as mock_convert, \
-         patch("convert.pronunciation_assessment") as mock_assess:
-        yield mock_store, mock_convert, mock_assess
+def mock_dependencies(monkeypatch):
+    mock_store = Mock()
+    mock_convert = Mock()
+    mock_assess = Mock()
+
+    # Override attributes on the imported convert module
+    monkeypatch.setattr(convert, "audio_store", mock_store)
+    monkeypatch.setattr(convert, "convert_to_wav", mock_convert)
+    monkeypatch.setattr(convert, "pronunciation_assessment", mock_assess)
+
+    return mock_store, mock_convert, mock_assess
 
 
 @pytest.fixture

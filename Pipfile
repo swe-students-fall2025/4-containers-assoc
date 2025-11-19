@@ -6,6 +6,9 @@ name = "pypi"
 [packages]
 azure-cognitiveservices-speech = "*"
 pydub = "*"
+fastapi = "*"
+uvicorn = "*"
+python-multipart = "*"
 
 [dev-packages]
 black = "*"
