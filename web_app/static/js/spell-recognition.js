@@ -549,9 +549,15 @@ function startRecording() {
     mediaRecorder.start();
     isRecording = true;
     const spellName = currentSpell || 'Unknown spell';
-    const pronunciation = currentSpell.pronunciation || "-";
     if (currentSpell) {
-        updateOutputWindow(`Recording ... Click to stop. \n Spell: "${spellName}" \n Pronunciation: "${pronunciation}"`, spellName, pronunciation);
+        loadSpellData().then(spellData => {
+            const spell = spellData.find(s => s.spell === spellName);
+            const pron = spell?.pronunciation || "-";
+            updateOutputWindow(
+                `Recording... Click to stop.<br>Spell: ${spellName}<br>Pronunciation: ${pron}`,
+                spellName
+            );
+        });
     } else {
         updateOutputWindow('Recording... Click to stop and upload.');
     }
@@ -604,8 +610,8 @@ async function uploadAudio() {
             const comment = result.grade_label || '';
 
             updateOutputWindow(
-                `Spell: ${displaySpell}\n` +
-                `You said: "${recognized}"\n` +
+                `Spell: ${displaySpell}<br>` +
+                `You said: "${recognized}"<br>` +
                 `Grade: ${grade} – ${comment}`,
                 displaySpell
             );
@@ -632,7 +638,6 @@ function showAssessmentResult(result, spellName) {
     const gradeSpan = document.getElementById('assessment-grade');
     const textLine = document.getElementById('assessment-text-line');
     const textSpan = document.getElementById('assessment-text');
-    const currentSpellNameSpan = document.getElementById('current-spell-name');
 
     if (!result.success) {
         if (statusLine) {
@@ -646,10 +651,6 @@ function showAssessmentResult(result, spellName) {
 
     if (statusLine) {
         statusLine.textContent = `You cast ${spellName}!`;
-    }
-
-    if (currentSpellNameSpan) {
-        currentSpellNameSpan.textContent = spellName;
     }
 
     if (gradeLine && gradeSpan) {
@@ -744,15 +745,17 @@ function updateOutputWindow(message, spellName = null) {
 
     // Main status / feedback line
     const msgP = document.createElement('p');
-    msgP.textContent = message;
+    msgP.innerHTML = message;
     outputWindow.appendChild(msgP);
 
     // Optional: show which spell the user is working on
+    /*
     if (spellName) {
         const spellP = document.createElement('p');
         spellP.innerHTML = `<span class="spell-meta">Spell:</span> ${spellName}`;
         outputWindow.appendChild(spellP);
     }
+    */
 }
 
 function simulateVoiceRecognition(spellName) {
