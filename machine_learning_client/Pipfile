@@ -13,6 +13,9 @@ python-dotenv = "*"
 pytest = "*"
 pytest-cov = "*"
 pytest-asyncio = "*"
+fastapi = "*"
+bson = "*"
+pytest-asyncio = "*"
 pytest-mock = "*"
 
 [requires]
