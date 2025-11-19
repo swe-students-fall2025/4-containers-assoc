@@ -6,16 +6,6 @@ jobs:
   test-ml-service:
     runs-on: ubuntu-latest
 
-    env:
-      SPEECH_KEY: dummy
-      SPEECH_REGION: dummy
-      MONGO_URI: mongodb://localhost:27017
-      DB_NAME: test_db
-
-    defaults:
-      run:
-        working-directory: machine_learning_client
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -26,19 +16,16 @@ jobs:
           python-version: "3.10"
 
       - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libsndfile1 portaudio19-dev ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y libsndfile1 portaudio19-dev ffmpeg
 
       - name: Install Python dependencies
-        working-directory: machine_learning_client
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r machine_learning_client/requirements.txt
 
       - name: Add project to PYTHONPATH
         run: |
-          echo "PYTHONPATH=$PWD" >> $GITHUB_ENV
+          echo "PYTHONPATH=$PWD/machine_learning_client" >> $GITHUB_ENV
 
       - name: Set dummy Azure env vars
         run: |
@@ -46,15 +33,17 @@ jobs:
           echo "SPEECH_REGION=dummy" >> $GITHUB_ENV
 
       - name: Mock system modules for CI
+        working-directory: machine_learning_client
         run: |
           echo "import sys; from unittest.mock import MagicMock; sys.modules['audioop'] = MagicMock()" > conftest.py
 
       - name: Run tests with coverage
+        working-directory: machine_learning_client
         run: |
           pytest \
-            machine_learning_client/tests \
-            --cov=machine_learning_client.audio_store \
-            --cov=machine_learning_client.convert \
-            --cov=machine_learning_client.pronun_assess \
+            --cov=audio_store \
+            --cov=convert \
+            --cov=pronun_assess \
             --cov-fail-under=80 \
-            --import-mode=importlib
+            --import-mode=importlib \
+            tests
