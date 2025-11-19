@@ -50,21 +50,18 @@ pipenv run pytest flaskTests.py \
 # Navigate to the project folder
 cd machine_learning_client
 
-# Install dependencies using Pipenv
-pipenv install --dev
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
-# Format all Python code with Black
-pipenv run black .
+python -m pip install --upgrade pip
+pip install -r requirements.txt
 
-# Lint all Python files with Pylint
-pipenv run pylint **/*.py
-
-# Run tests with coverage
-pipenv run pytest \
-            --cov=. \
-            --cov-report=term-missing \
-            --cov-fail-under=80 \
-            --import-mode=importlib
+pytest \
+  --cov=. \
+  --cov-report=term-missing \
+  --cov-fail-under=80 \
+  --import-mode=importlib \
+  tests
 ```
 
 ## Team Assoc
