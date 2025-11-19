@@ -21,27 +21,15 @@ def mock_mongo():
 def test_init_success(mock_mongo):
     mock_client, mock_db, mock_gridfs, mock_attempts_col = mock_mongo
     store = AudioStore("mongodb://localhost:27017", "test_db")
-    store._fs = mock_gridfs
-    store._attempts_col = mock_attempts_col
+
     assert store._client is mock_client
     assert store._db is mock_db
-
     mock_gridfs.assert_called_once_with(mock_db, collection="audio")
 
 def test_init_with_custom_collection(mock_mongo):
     _, mock_db, mock_gridfs, mock_attempts_col = mock_mongo
     store = AudioStore("mongodb://localhost:27017", "test_db", collection="custom")
-    store._fs = mock_gridfs
-    store._attempts_col = mock_attempts_col
 
-    mock_gridfs.assert_called_once_with(mock_db, collection="custom")
-
-
-def test_init_with_custom_collection(mock_mongo):
-    _, mock_db, mock_gridfs, mock_attempts_col = mock_mongo
-    store = AudioStore("mongodb://localhost:27017", "test_db", collection="custom")
-    store._fs = mock_gridfs
-    store._attempts_col = mock_attempts_col
     mock_gridfs.assert_called_once_with(mock_db, collection="custom")
 
 
