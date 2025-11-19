@@ -34,4 +34,6 @@ jobs:
           echo "import sys; from unittest.mock import MagicMock; sys.modules['audioop'] = MagicMock()" > conftest.py
 
       - name: Run Machine Learning Client Tests
-        run: pytest --cov=. --cov-fail-under=80
+        run: |
+          export PYTHONPATH=$PWD
+          pytest --cov=. --cov-fail-under=80
