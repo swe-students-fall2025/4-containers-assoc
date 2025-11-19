@@ -50,23 +50,22 @@ pipenv run pytest flaskTests.py \
 # Navigate to the project folder
 cd machine_learning_client
 
-# Install dependencies from requirements.txt
-pip install -r requirements.txt
+# Install dependencies using Pipenv
+pipenv install --dev
 
 # Format all Python code with Black
-black .
+pipenv run black .
 
 # Lint all Python files with Pylint
-pylint **/*.py
+pipenv run pylint **/*.py
 
 # Run tests with coverage
-pytest \
+pipenv run pytest \
             --cov=audio_store \
             --cov=convert \
             --cov=pronun_assess \
             --cov-fail-under=80 \
             --import-mode=importlib
-
 ```
 
 ## Team Assoc
