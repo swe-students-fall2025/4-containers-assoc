@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Holingo | Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+    <style>
+      .auth-container {
+        max-width: 480px;
+        margin: 0 auto;
+      }
+
+      .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .auth-header h1 {
+        font-size: clamp(1.7rem, 2.4vw, 2.4rem);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .auth-header p {
+        font-size: 1rem;
+        color: rgba(226, 232, 240, 0.85);
+      }
+
+      .auth-form {
+        background: rgba(15, 23, 42, 0.75);
+        border: 1px solid rgba(94, 234, 212, 0.2);
+        border-radius: 18px;
+        padding: 2rem;
+        display: grid;
+        gap: 1.5rem;
+      }
+
+      .form-group {
+        display: grid;
+        gap: 0.5rem;
+      }
+
+      .form-label {
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: rgba(226, 232, 240, 0.9);
+      }
+
+      .form-control {
+        padding: 0.7rem 1rem;
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        background: rgba(15, 23, 42, 0.6);
+        color: #f1f5f9;
+        font-size: 0.95rem;
+        width: 100%;
+        transition: border-color 0.2s ease;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: rgba(94, 234, 212, 0.5);
+      }
+
+      .form-control::placeholder {
+        color: rgba(148, 163, 184, 0.6);
+      }
+
+      .btn-submit {
+        padding: 0.75rem 1.5rem;
+        border-radius: 999px;
+        border: none;
+        background: linear-gradient(135deg, #38bdf8, #6366f1);
+        color: #f8fafc;
+        font-weight: 600;
+        font-size: 1rem;
+        letter-spacing: 0.05em;
+        cursor: pointer;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+        width: 100%;
+      }
+
+      .btn-submit:hover {
+        opacity: 0.9;
+      }
+
+      .btn-submit:active {
+        transform: scale(0.98);
+      }
+
+      .auth-messages {
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        background: rgba(251, 191, 36, 0.15);
+        border: 1px solid rgba(251, 191, 36, 0.3);
+        color: rgba(254, 240, 138, 0.95);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+      }
+
+      .auth-links {
+        text-align: center;
+        margin-top: 1.5rem;
+        display: grid;
+        gap: 0.5rem;
+      }
+
+      .auth-links a {
+        color: rgba(148, 163, 184, 0.9);
+        text-decoration: underline;
+        text-decoration-color: rgba(148, 163, 184, 0.4);
+        transition: color 0.2s ease;
+      }
+
+      .auth-links a:hover {
+        color: rgba(94, 234, 212, 0.9);
+        text-decoration-color: rgba(94, 234, 212, 0.6);
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="app-header">
+      <div class="app-header__inner">
+        <div class="brand">Holingo</div>
+        <nav class="nav-links">
+          <a href="{{ url_for('spells_view') }}">Spells</a>
+          <a href="{{ url_for('login') }}">Login</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="auth-container">
+        <div class="auth-header">
+          <h1>Create Account</h1>
+          <p>Join our community</p>
+        </div>
+
+        <div class="auth-form">
+          {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              <div class="auth-messages">
+                {% for message in messages %}
+                  {{ message }}
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+
+          <form action="{{ url_for('register') }}" method="post" id="registerForm">
+            <div class="form-group">
+              <label class="form-label" for="username">Username</label>
+              <input
+                type="text"
+                class="form-control"
+                id="username"
+                name="username"
+                placeholder="Enter your username"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="email">Email</label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                name="email"
+                placeholder="you@example.com"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="password">Password</label>
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                name="password"
+                placeholder="Create a password"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="confirm-password">Confirm Password</label>
+              <input
+                type="password"
+                class="form-control"
+                id="confirm-password"
+                name="confirm-password"
+                placeholder="Repeat your password"
+                required
+              />
+            </div>
+
+            <button type="submit" class="btn-submit">Sign Up</button>
+          </form>
+
+          <div class="auth-links">
+            <p>Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
+            <p><a href="{{ url_for('spells_view') }}">Continue as guest</a></p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>Developed by Team Assoc.</p>
+    </footer>
+
+    <script>
+      // 密码确认验证
+      document.getElementById('registerForm').addEventListener('submit', function(e) {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+        
+        if (password !== confirmPassword) {
+          e.preventDefault();
+          alert('Passwords do not match!');
+          return false;
+        }
+      });
+    </script>
+  </body>
+</html>

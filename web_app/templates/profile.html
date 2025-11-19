@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Holingo | Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+    <style>
+      .profile-container {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .profile-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .profile-header h1 {
+        font-size: clamp(1.7rem, 2.4vw, 2.4rem);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .profile-card {
+        background: rgba(15, 23, 42, 0.75);
+        border: 1px solid rgba(94, 234, 212, 0.2);
+        border-radius: 18px;
+        padding: 2rem;
+        display: grid;
+        gap: 1.5rem;
+      }
+
+      .profile-info {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .info-item {
+        display: grid;
+        gap: 0.5rem;
+      }
+
+      .info-label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: rgba(148, 163, 184, 0.8);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .info-value {
+        font-size: 1.1rem;
+        color: rgba(226, 232, 240, 0.95);
+      }
+
+      .profile-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 999px;
+        border: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        letter-spacing: 0.05em;
+        cursor: pointer;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #38bdf8, #6366f1);
+        color: #f8fafc;
+      }
+
+      .btn-secondary {
+        background: rgba(148, 163, 184, 0.2);
+        color: rgba(226, 232, 240, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+      }
+
+      .btn:hover {
+        opacity: 0.9;
+      }
+
+      .btn:active {
+        transform: scale(0.98);
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="app-header">
+      <div class="app-header__inner">
+        <div class="brand">Holingo</div>
+        <nav class="nav-links">
+          <a href="{{ url_for('spells_view') }}">Spells</a>
+          <a href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="profile-container">
+        <div class="profile-header">
+          <h1>User Profile</h1>
+          <p>Your account information</p>
+        </div>
+
+        <div class="profile-card">
+          <div class="profile-info">
+            <div class="info-item">
+              <div class="info-label">Username</div>
+              <div class="info-value">{{ user.username or "Not set" }}</div>
+            </div>
+
+            <div class="info-item">
+              <div class="info-label">Email</div>
+              <div class="info-value">{{ user.email or "Not set" }}</div>
+            </div>
+          </div>
+
+          <div class="profile-actions">
+            <a href="{{ url_for('spells_view') }}" class="btn btn-primary">Browse Spells</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-secondary">Logout</a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>Developed by Team Assoc.</p>
+    </footer>
+  </body>
+</html>
+

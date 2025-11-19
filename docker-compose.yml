@@ -43,6 +43,8 @@ services:
       - "5001:5001"
     env_file:
       - .env
+    volumes:
+      - ./web_app:/app
     depends_on:
       - seed
       - ml-client
