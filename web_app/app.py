@@ -16,6 +16,7 @@ ML_SERVICE_URL = os.getenv("ML_SERVICE_URL")
 
 def create_app():
     app = Flask(__name__)
+    app.secret_key = os.getenv("SECRET_KEY") or "dev-secret-key-change-in-production"
     login_manager.init_app(app) # config login manager for login
     login_manager.login_view = "login" 
 
@@ -25,7 +26,7 @@ def create_app():
 
     @login_manager.user_loader
     def load_user(user_id):
-        db_user = app.db.users.find_one({"_id": ObjectId(user_id)})
+        db_user = db.users.find_one({"_id": ObjectId(user_id)})
         return User(db_user) if db_user else None
 
     @app.route("/audio")
