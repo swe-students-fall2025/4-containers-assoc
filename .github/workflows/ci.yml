@@ -4,9 +4,11 @@ on:
   push:
     paths:
       - 'web_app/**'
+      - '.github/workflows/**'
   pull_request:
     paths:
       - 'web_app/**'
+      - '.github/workflows/**'
 
 jobs:
   test:
