@@ -22,6 +22,52 @@ This will:
     - start up the Flask web app
 No manual database setup is required — the seed container inserts data on startup.
 
+## Development
+
+```bash
+# Navigate to the project folder
+cd web_app
+
+# Install dependencies
+pipenv install --dev
+
+# Format all Python code
+pipenv run black .
+
+# Lint all Python files
+pipenv run pylint **/*.py
+
+# Run Flask tests with coverage
+pipenv run pytest flaskTests.py \
+            --cov=app \
+            --cov=models \
+            --cov-fail-under=80
+
+
+```
+
+```bash
+# Navigate to the project folder
+cd machine_learning_client
+
+# Install dependencies from requirements.txt
+pip install -r requirements.txt
+
+# Format all Python code with Black
+black .
+
+# Lint all Python files with Pylint
+pylint **/*.py
+
+# Run tests with coverage
+pytest \
+            --cov=audio_store \
+            --cov=convert \
+            --cov=pronun_assess \
+            --cov-fail-under=80 \
+            --import-mode=importlib
+
+```
 
 ## Team Assoc
 
