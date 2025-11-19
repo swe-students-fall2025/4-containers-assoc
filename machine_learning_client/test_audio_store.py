@@ -7,28 +7,34 @@ from audio_store import AudioStore
 
 @pytest.fixture
 def mock_mongo():
-    with patch("audio_store.MongoClient") as mock_client_class, \
-         patch("audio_store.GridFS") as mock_gridfs_class:
+    mock_client = MagicMock()
+    mock_db = MagicMock()
+    mock_attempts_col = MagicMock()
+    mock_db.__getitem__.return_value = mock_attempts_col
 
-        mock_client = MagicMock()
-        mock_db = MagicMock()
-        mock_client.__getitem__.return_value = mock_db
-        mock_gridfs_instance = MagicMock()
-        mock_gridfs_class.return_value = mock_gridfs_instance
-        mock_attempts_col = MagicMock()
-        mock_db.__getitem__.return_value = mock_attempts_col
+    mock_gridfs_instance = MagicMock()
 
+    with patch("audio_store.MongoClient", return_value=mock_client) as mock_client_class, \
+         patch("audio_store.GridFS", return_value=mock_gridfs_instance) as mock_gridfs_class:
         yield mock_client, mock_db, mock_gridfs_instance, mock_attempts_col
-
 
 def test_init_success(mock_mongo):
     mock_client, mock_db, mock_gridfs, mock_attempts_col = mock_mongo
     store = AudioStore("mongodb://localhost:27017", "test_db")
     store._fs = mock_gridfs
     store._attempts_col = mock_attempts_col
-    assert store._client == mock_client
-    assert store._db == mock_db
+    assert store._client is mock_client
+    assert store._db is mock_db
+
     mock_gridfs.assert_called_once_with(mock_db, collection="audio")
+
+def test_init_with_custom_collection(mock_mongo):
+    _, mock_db, mock_gridfs, mock_attempts_col = mock_mongo
+    store = AudioStore("mongodb://localhost:27017", "test_db", collection="custom")
+    store._fs = mock_gridfs
+    store._attempts_col = mock_attempts_col
+
+    mock_gridfs.assert_called_once_with(mock_db, collection="custom")
 
 
 def test_init_with_custom_collection(mock_mongo):
