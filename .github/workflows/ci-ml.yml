@@ -6,6 +6,16 @@ jobs:
   test-ml-service:
     runs-on: ubuntu-latest
 
+    env:
+      SPEECH_KEY: dummy
+      SPEECH_REGION: dummy
+      MONGO_URI: mongodb://localhost:27017
+      DB_NAME: test_db
+
+    defaults:
+      run:
+        working-directory: machine_learning_client
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4

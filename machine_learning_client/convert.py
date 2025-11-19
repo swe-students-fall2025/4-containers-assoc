@@ -8,7 +8,13 @@ from .audio_store import AudioStore
 from .pronun_assess import convert_to_wav, pronunciation_assessment
 
 app = FastAPI()
-audio_store = AudioStore.from_env()
+try:
+    # In normal runtime, use env config.
+    audio_store = AudioStore.from_env()
+except ValueError:
+    # In test/CI environments where MONGO_URI / DB_NAME are not set,
+    # allow import to succeed. Tests will monkeypatch `convert.audio_store`.
+    audio_store = None
 
 @app.post("/assess")
 async def assess_pronunciation(
