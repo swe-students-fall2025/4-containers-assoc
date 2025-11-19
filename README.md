@@ -1,4 +1,4 @@
-![Lint-free](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml/badge.svg)
+![Lint-free](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml/badge.svg) [![Web App CI](https://github.com/swe-students-fall2025/4-containers-assoc/actions/workflows/ci.yml/badge.svg)](https://github.com/swe-students-fall2025/4-containers-assoc/actions/workflows/ci.yml) [![ML-tests CI](https://github.com/swe-students-fall2025/4-containers-assoc/actions/workflows/ci-ml.yml/badge.svg)](https://github.com/swe-students-fall2025/4-containers-assoc/actions/workflows/ci-ml.yml)
 
 # Holingo - Harry Potter Spell Pronunciation System
 
