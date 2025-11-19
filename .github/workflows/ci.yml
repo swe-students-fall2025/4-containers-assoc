@@ -1,28 +1,29 @@
 name: Web App CI
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     services:
-    mongo:
-      image: mongo:6.0
-      ports:
-        - 27017:27017
-      options: >-
-        --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'"
-        --health-interval 10s
-        --health-timeout 5s
-        --health-retries 5
-
+      mongo:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
 
     env:
       MONGO_URI: mongodb://localhost:27017
       DB_NAME: test_db
       SECRET_KEY: test_secret
-      ML_SERVICE_URL: http://localhost:5002  # just a placeholder
+      ML_SERVICE_URL: http://localhost:5002
 
     steps:
       - name: Checkout repository
@@ -44,7 +45,7 @@ jobs:
 
       - name: Run unit tests with coverage
         working-directory: web_app
-        run: pipenv run python -m pytest flaskTests.py --cov=. --cov-fail-under=80
+        run: pipenv run pytest flaskTests.py --cov=. --cov-fail-under=80
 
       - name: Upload coverage report
         if: success()
