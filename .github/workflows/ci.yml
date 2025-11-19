@@ -40,13 +40,9 @@ jobs:
         working-directory: web_app
         run: pipenv install --dev
 
-      - name: Run unit tests with coverage
-        working-directory: web_app
-        run: pipenv run pytest flaskTests.py --cov=. --cov-fail-under=80
-
-      - name: Upload coverage report
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: web_app/htmlcov/
+      - name: Run tests with coverage
+        run: |
+          pytest \
+            --cov=app \
+            --cov=models \
+            --cov-fail-under=80 \
