@@ -1,4 +1,4 @@
-name: ml-tests
+name: ML-tests CI
 
 on:
   push:
@@ -21,15 +21,17 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install dependencies (pipenv)
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libsndfile1 portaudio19-dev
+
+      - name: Install Python dependencies
         run: |
-          pip install --upgrade pip
-          pip install pipenv
-          pipenv install --dev
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Mock system modules for CI
+        run: |
+          echo "import sys; from unittest.mock import MagicMock; sys.modules['audioop'] = MagicMock()" > conftest.py
+
       - name: Run Machine Learning Client Tests
-        run: pipenv run pytest --cov=. --cov-fail-under=80
-
-
-      - name: Run tests
-        run: |
-          pytest --cov=. --cov-fail-under=80
+        run: pytest --cov=. --cov-fail-under=80

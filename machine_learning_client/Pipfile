@@ -6,8 +6,20 @@ name = "pypi"
 [packages]
 pylint = "*"
 black = "*"
+azure-cognitiveservices-speech = "*"
+azure-core = "*"
+pydub = "*"
 pymongo = "*"
 python-dotenv = "*"
+fastapi = "*"
+requests = "*"
+python-multipart = "*"
+pytest = ">=7.0.0"
+pytest-cov = ">=4.0.0"
+pytest-asyncio = ">=0.21.0"
+pytest-mock = ">=3.10.0"
+uvicorn = {extras = ["standard"], version = "*"}
+httpx = "*"
 
 [dev-packages]
 pytest = "*"
@@ -15,8 +27,5 @@ pytest-cov = "*"
 pytest-asyncio = "*"
 fastapi = "*"
 bson = "*"
-pytest-asyncio = "*"
 pytest-mock = "*"
-
-[requires]
-python_version = "3.10"
+httpx = "*"
