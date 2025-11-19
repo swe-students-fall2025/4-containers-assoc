@@ -43,7 +43,7 @@ jobs:
       - name: Run tests with coverage
         working-directory: web_app
         run: |
-          pipenv run pytest \
+          pipenv run pytest flaskTests.py \
             --cov=app \
             --cov=models \
-            --cov-fail-under=80 \
+            --cov-fail-under=80
