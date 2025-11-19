@@ -605,13 +605,11 @@ async function uploadAudio() {
 
         if (result.success) {
             const displaySpell = result.spell || spellName;
-            const recognized = result.recognized_text || '(no speech recognized)';
             const grade = result.grade || 'N/A';
             const comment = result.grade_label || '';
 
             updateOutputWindow(
                 `Spell: ${displaySpell}<br>` +
-                `You said: "${recognized}"<br>` +
                 `Grade: ${grade} – ${comment}`,
                 displaySpell
             );
