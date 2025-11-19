@@ -61,9 +61,8 @@ pipenv run pylint **/*.py
 
 # Run tests with coverage
 pipenv run pytest \
-            --cov=audio_store \
-            --cov=convert \
-            --cov=pronun_assess \
+            --cov=. \
+            --cov-report=term-missing \
             --cov-fail-under=80 \
             --import-mode=importlib
 ```
