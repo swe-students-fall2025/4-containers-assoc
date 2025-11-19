@@ -1,8 +1,6 @@
 name: ML-tests CI
 
-on:
-  push:
-  pull_request:
+on: [push, pull_request]
 
 jobs:
   test-ml-service:
@@ -42,5 +40,12 @@ jobs:
         run: |
           echo "import sys; from unittest.mock import MagicMock; sys.modules['audioop'] = MagicMock()" > conftest.py
 
-      - name: Run Machine Learning Client Tests
-        run: pytest --cov=. --cov-fail-under=80 --import-mode=importlib
+      - name: Run tests with coverage
+        run: |
+          pytest \
+            --cov=audio_store \
+            --cov=convert \
+            --cov=pronun_assess \
+            --cov-fail-under=80 \
+            --import-mode=importlib
+
