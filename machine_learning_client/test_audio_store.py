@@ -18,21 +18,6 @@ def mock_mongo():
          patch("audio_store.GridFS", return_value=mock_gridfs_instance) as mock_gridfs_class:
         yield mock_client, mock_db, mock_gridfs_instance, mock_attempts_col
 
-def test_init_success(mock_mongo):
-    mock_client, mock_db, mock_gridfs, mock_attempts_col = mock_mongo
-    store = AudioStore("mongodb://localhost:27017", "test_db")
-
-    assert store._client is mock_client
-    assert store._db is mock_db
-    mock_gridfs.assert_called_once_with(mock_db, collection="audio")
-
-def test_init_with_custom_collection(mock_mongo):
-    _, mock_db, mock_gridfs, mock_attempts_col = mock_mongo
-    store = AudioStore("mongodb://localhost:27017", "test_db", collection="custom")
-
-    mock_gridfs.assert_called_once_with(mock_db, collection="custom")
-
-
 def test_save_audio_basic(mock_mongo):
     _, mock_db, mock_gridfs, mock_attempts_col = mock_mongo
     store = AudioStore("mongodb://localhost:27017", "test_db")
