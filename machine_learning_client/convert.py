@@ -22,6 +22,9 @@ async def assess_pronunciation(
             spell=spell,
             filename=audio.filename,
             content_type=audio.content_type or "audio/webm",
+
+            if content_type == "video/webm":
+                content_type = "audio/webm"
         )
 
         # 2) Dump audio bytes from GridFS to a temp source file

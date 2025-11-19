@@ -1,5 +1,5 @@
 import os
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch, MagicMock
 from io import BytesIO
 import pytest
 from bson import ObjectId
@@ -8,12 +8,18 @@ from audio_store import AudioStore
 
 @pytest.fixture
 def mock_mongo():
-    with patch("audio_store.MongoClient") as mock_client_class, patch("audio_store.GridFS") as mock_gridfs_class:
-        mock_client = Mock()
-        mock_db = Mock()
+    with patch("audio_store.MongoClient") as mock_client_class, \
+         patch("audio_store.GridFS") as mock_gridfs_class:
+
+        mock_client = MagicMock()
+        mock_db = MagicMock()
         mock_client.__getitem__.return_value = mock_db
+        mock_db.audio_metadata = MagicMock()
+        mock_gridfs = MagicMock()
         mock_client_class.return_value = mock_client
-        yield mock_client, mock_db, mock_gridfs_class
+        mock_gridfs_class.return_value = mock_gridfs
+        yield mock_client, mock_db, mock_gridfs
+
 
 
 def test_init_success(mock_mongo):
