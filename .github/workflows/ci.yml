@@ -41,8 +41,9 @@ jobs:
         run: pipenv install --dev
 
       - name: Run tests with coverage
+        working-directory: web_app
         run: |
-          pytest \
+          pipenv run pytest \
             --cov=app \
             --cov=models \
             --cov-fail-under=80 \
