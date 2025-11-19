@@ -7,11 +7,11 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean
 
 # Copy ONLY the contents of the web_app folder into the container
-COPY web_app/requirements.txt ./requirements.txt
+COPY web-app/requirements.txt ./requirements.txt
 # Install the web app dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY web_app/ .
+COPY web-app/ .
 
 EXPOSE 5001
 

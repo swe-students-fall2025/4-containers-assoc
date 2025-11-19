@@ -24,7 +24,7 @@ services:
   ml-client:
     build:
       context: .
-      dockerfile: machine_learning_client/Dockerfile
+      dockerfile: machine-learning-client/Dockerfile
     container_name: ml-client
     env_file:
       - .env 
@@ -37,14 +37,14 @@ services:
   web-app:
     build:
       context: .
-      dockerfile: web_app/Dockerfile
+      dockerfile: web-app/Dockerfile
     container_name: web-app
     ports:
       - "5001:5001"
     env_file:
       - .env
     volumes:
-      - ./web_app:/app
+      - ./web-app:/app
     depends_on:
       - seed
       - ml-client
