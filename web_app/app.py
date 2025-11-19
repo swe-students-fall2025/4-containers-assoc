@@ -16,7 +16,7 @@ ML_SERVICE_URL = os.getenv("ML_SERVICE_URL")
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = os.getenv("SECRET_KEY") or "dev-secret-key-change-in-production"
+    app.secret_key = os.getenv("SECRET_KEY")
     login_manager.init_app(app) # config login manager for login
     login_manager.login_view = "login" 
 

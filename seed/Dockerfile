@@ -3,6 +3,7 @@ FROM python:3.10-slim
 WORKDIR /app
 
 COPY seed/spells.json .
+COPY seed/users.json .
 COPY seed/seed.py .
 
 RUN pip install pymongo
