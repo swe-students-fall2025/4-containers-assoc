@@ -13,26 +13,22 @@ os.environ["DB_NAME"] = "test_db"
 def mock_mongo():
     with patch("audio_store.MongoClient") as mock_client_class, \
          patch("audio_store.GridFS") as mock_gridfs_class:
-
+         
         mock_client = MagicMock()
         mock_db = MagicMock()
         mock_client.__getitem__.return_value = mock_db
-
-        mock_attempts_col = MagicMock()
-        mock_db.__getitem__.return_value = mock_attempts_col
-
-        mock_gridfs = MagicMock()
+        mock_gridfs_instance = MagicMock()
+        mock_gridfs_class.return_value = mock_gridfs_instance
         mock_client_class.return_value = mock_client
-        mock_gridfs_class.return_value = mock_gridfs
-        yield mock_client, mock_db, mock_gridfs, mock_attempts_col
+        yield mock_client, mock_db, mock_gridfs_class, mock_gridfs_instance
 
 
 def test_init_success(mock_mongo):
-    mock_client, mock_db, mock_gridfs, _ = mock_mongo
+    mock_client, mock_db, mock_gridfs_class, mock_gridfs_instance = mock_mongo
     store = AudioStore("mongodb://localhost:27017", "test_db")
     assert store._client == mock_client
     assert store._db == mock_db
-    mock_gridfs.assert_called_once_with(mock_db, collection="audio")
+    mock_gridfs_class.assert_called_once_with(mock_db, collection="audio")
 
 
 def test_save_audio_basic(mock_mongo):
