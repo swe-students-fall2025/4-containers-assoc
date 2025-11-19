@@ -4,11 +4,17 @@ import tempfile
 import os
 import traceback
 
-from audio_store import AudioStore 
-from pronun_assess import convert_to_wav, pronunciation_assessment
+from .audio_store import AudioStore 
+from .pronun_assess import convert_to_wav, pronunciation_assessment
 
 app = FastAPI()
-audio_store = AudioStore.from_env()
+try:
+    # In normal runtime, use env config.
+    audio_store = AudioStore.from_env()
+except ValueError:
+    # In test/CI environments where MONGO_URI / DB_NAME are not set,
+    # allow import to succeed. Tests will monkeypatch `convert.audio_store`.
+    audio_store = None
 
 @app.post("/assess")
 async def assess_pronunciation(
@@ -20,7 +26,7 @@ async def assess_pronunciation(
         if content_type == "video/webm":
             content_type = "audio/webm"
 
-        # 1) Save the uploaded audio into GridFS
+        # Save the uploaded audio into GridFS
         file_id = audio_store.save_audio(
             audio.file,
             spell=spell,
@@ -28,26 +34,26 @@ async def assess_pronunciation(
             content_type=content_type,
         )
 
-        # 2) Dump audio bytes from GridFS to a temp source file
+        # Dump audio bytes from GridFS to a temp source file
         with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as tmp_in:
             # write into the open file object
             audio_store.load_audio_to_file(file_id, tmp_in)
             input_path = tmp_in.name  # remember the path for later
 
-        # 3) Convert that source file to WAV (Azure-friendly)
+        # Convert that source file to WAV (Azure-friendly)
         wav_path = convert_to_wav(input_path)
 
-        # 4) Run pronunciation assessment on the WAV file
+        # Run pronunciation assessment on the WAV file
         result = pronunciation_assessment(spell, wav_path)
 
-        # 5) Clean up temp files
+        # Clean up temp files
         for path in (input_path, wav_path):
             try:
                 os.remove(path)
             except OSError:
                 pass
 
-        # 6) Include file_id in response
+        # Include file_id in response
         result["file_id"] = str(file_id)
 
         return JSONResponse(

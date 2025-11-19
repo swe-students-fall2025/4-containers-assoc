@@ -9,7 +9,7 @@ import pytest
 os.environ.setdefault("SPEECH_KEY", "test_key")
 os.environ.setdefault("SPEECH_REGION", "test_region")
 
-import pronun_assess
+from ..pronun_assess import pronunciation_assessment, grade_from_score, convert_to_wav
 
 
 @pytest.mark.parametrize(
@@ -30,13 +30,13 @@ import pronun_assess
     ],
 )
 def test_grade_from_score(score, expected_grade, expected_label, expected_color):
-    result = pronun_assess.grade_from_score(score)
+    result = grade_from_score(score)
     assert result["grade"] == expected_grade
     assert result["label"] == expected_label
     assert result["color"] == expected_color
 
 
-@patch("pronun_assess.AudioSegment")
+@patch("machine_learning_client.pronun_assess.AudioSegment")
 def test_convert_to_wav(mock_audio_segment):
     mock_audio = Mock()
     mock_audio.set_frame_rate.return_value = mock_audio
@@ -47,7 +47,7 @@ def test_convert_to_wav(mock_audio_segment):
         src_path = tmp_file.name
 
     try:
-        result_path = pronun_assess.convert_to_wav(src_path)
+        result_path = convert_to_wav(src_path)
         assert result_path == src_path + ".wav"
         mock_audio_segment.from_file.assert_called_once_with(src_path)
         mock_audio.set_frame_rate.assert_called_once_with(16000)
@@ -59,9 +59,9 @@ def test_convert_to_wav(mock_audio_segment):
                 os.remove(path)
 
 
-@patch("pronun_assess.speechsdk")
-@patch("pronun_assess.SpeechConfig")
-@patch("pronun_assess.AudioConfig")
+@patch("machine_learning_client.pronun_assess.speechsdk")
+@patch("machine_learning_client.pronun_assess.SpeechConfig")
+@patch("machine_learning_client.pronun_assess.AudioConfig")
 def test_pronunciation_assessment_success(mock_audio_config, mock_speech_config, mock_speechsdk):
     mock_result = Mock()
     mock_result.reason = mock_speechsdk.ResultReason.RecognizedSpeech
@@ -75,7 +75,7 @@ def test_pronunciation_assessment_success(mock_audio_config, mock_speech_config,
     mock_speechsdk.SpeechRecognizer.return_value = mock_recognizer
     mock_speechsdk.PronunciationAssessmentResult.return_value = mock_assessment
 
-    result = pronun_assess.pronunciation_assessment("Lumos", "/path/to/audio.wav")
+    result = pronunciation_assessment("Lumos", "/path/to/audio.wav")
 
     assert result["success"] is True
     assert result["recognized_text"] == "Lumos"
@@ -83,9 +83,9 @@ def test_pronunciation_assessment_success(mock_audio_config, mock_speech_config,
     assert result["grade"] == "O"
 
 
-@patch("pronun_assess.speechsdk")
-@patch("pronun_assess.SpeechConfig")
-@patch("pronun_assess.AudioConfig")
+@patch("machine_learning_client.pronun_assess.speechsdk")
+@patch("machine_learning_client.pronun_assess.SpeechConfig")
+@patch("machine_learning_client.pronun_assess.AudioConfig")
 def test_pronunciation_assessment_no_match(mock_audio_config, mock_speech_config, mock_speechsdk):
     mock_result = Mock()
     mock_result.reason = mock_speechsdk.ResultReason.NoMatch
@@ -98,15 +98,15 @@ def test_pronunciation_assessment_no_match(mock_audio_config, mock_speech_config
     mock_recognizer.recognize_once.return_value = mock_result
     mock_speechsdk.SpeechRecognizer.return_value = mock_recognizer
 
-    result = pronun_assess.pronunciation_assessment("Lumos", "/path/to/audio.wav")
+    result = pronunciation_assessment("Lumos", "/path/to/audio.wav")
 
     assert result["success"] is False
     assert "No speech could be recognized" in result["error"]
 
 
-@patch("pronun_assess.speechsdk")
-@patch("pronun_assess.SpeechConfig")
-@patch("pronun_assess.AudioConfig")
+@patch("machine_learning_client.pronun_assess.speechsdk")
+@patch("machine_learning_client.pronun_assess.SpeechConfig")
+@patch("machine_learning_client.pronun_assess.AudioConfig")
 def test_pronunciation_assessment_canceled(mock_audio_config, mock_speech_config, mock_speechsdk):
     mock_result = Mock()
     mock_result.reason = mock_speechsdk.ResultReason.Canceled
@@ -120,7 +120,7 @@ def test_pronunciation_assessment_canceled(mock_audio_config, mock_speech_config
     mock_recognizer.recognize_once.return_value = mock_result
     mock_speechsdk.SpeechRecognizer.return_value = mock_recognizer
 
-    result = pronun_assess.pronunciation_assessment("Lumos", "/path/to/audio.wav")
+    result = pronunciation_assessment("Lumos", "/path/to/audio.wav")
 
     assert result["success"] is False
     assert "Recognition canceled" in result["error"]
@@ -133,9 +133,9 @@ def test_pronunciation_assessment_canceled(mock_audio_config, mock_speech_config
     (30.0, "A", "Acceptable"),
     (10.0, "T", "Troll"),
 ])
-@patch("pronun_assess.speechsdk")
-@patch("pronun_assess.SpeechConfig")
-@patch("pronun_assess.AudioConfig")
+@patch("machine_learning_client.pronun_assess.speechsdk")
+@patch("machine_learning_client.pronun_assess.SpeechConfig")
+@patch("machine_learning_client.pronun_assess.AudioConfig")
 def test_pronunciation_assessment_different_grades(
     mock_audio_config, mock_speech_config, mock_speechsdk, score, expected_grade, expected_label
 ):
@@ -151,7 +151,7 @@ def test_pronunciation_assessment_different_grades(
     mock_speechsdk.SpeechRecognizer.return_value = mock_recognizer
     mock_speechsdk.PronunciationAssessmentResult.return_value = mock_assessment
 
-    result = pronun_assess.pronunciation_assessment("Test", "/path/to/audio.wav")
+    result = pronunciation_assessment("Test", "/path/to/audio.wav")
 
     assert result["success"] is True
     assert result["grade"] == expected_grade
