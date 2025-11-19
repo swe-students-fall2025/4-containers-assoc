@@ -40,7 +40,7 @@ jobs:
       - name: Run tests with coverage
         working-directory: machine_learning_client
         run: |
-          pytest \
+          pytest machine_learning_client/tests \
             --cov=machine_learning_client \
             --cov-report=term-missing \
             --cov-fail-under=80 \
