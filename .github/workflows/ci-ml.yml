@@ -29,7 +29,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Set dummy Azure environment variables
+      - name: Add project to PYTHONPATH
+        run: |
+          echo "PYTHONPATH=$PWD" >> $GITHUB_ENV
+
+      - name: Set dummy Azure env vars
         run: |
           echo "SPEECH_KEY=dummy" >> $GITHUB_ENV
           echo "SPEECH_REGION=dummy" >> $GITHUB_ENV
@@ -37,7 +41,6 @@ jobs:
       - name: Mock system modules for CI
         run: |
           echo "import sys; from unittest.mock import MagicMock; sys.modules['audioop'] = MagicMock()" > conftest.py
-          echo "import sys; from unittest.mock import MagicMock; sys.modules['pronun_assess'] = MagicMock()" >> conftest.py
 
       - name: Run Machine Learning Client Tests
         run: pytest --cov=. --cov-fail-under=80 --import-mode=importlib
